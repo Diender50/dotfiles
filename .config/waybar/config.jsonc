@@ -1,0 +1,72 @@
+[
+  {
+    "name": "bar_bottom",
+    "reload_style_on_change": true,
+    "layer": "top",
+    "position": "bottom",
+
+    "spacing": 5,
+    "margin-bottom":10,
+    "margin-left":250,
+    "margin-right":250,
+
+    "include": [
+      "~/.config/waybar/modules.json",
+    ],
+
+    "modules-left": [
+      "wireplumber",
+      "mpris"
+    ],
+    "modules-center": [
+      "niri/workspaces"
+    ],
+    "modules-right": [
+      "clock",
+    ],
+  },
+  {
+    "name": "bar_cava",
+    "reload_style_on_change": true,
+    "layer": "bottom",
+    "exclusive": false,
+    "position": "bottom",
+    "include": [
+      "~/.config/waybar/modules.json",
+    ],
+    "modules-center": [
+      "cava"
+    ],
+  },
+  {
+    "name": "bar_top",
+    "reload_style_on_change": true,
+    "layer": "top",
+    "position": "top",
+
+    "spacing": 5,
+    "margin-top":10,
+    "margin-left":18,
+    "margin-right":18,
+
+    "include": [
+      "~/.config/waybar/modules.json",
+    ],
+
+    "modules-left": [
+      "cpu",
+      "memory",
+      "disk"
+    ],
+    "modules-center": [
+      "tray",
+    ],
+    "modules-right": [
+      "network",
+      "bluetooth",
+      "battery",
+      "custom/notification",
+      "custom/shutdown"
+    ],
+  }
+]

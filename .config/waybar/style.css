@@ -1,0 +1,120 @@
+/* -- Global rules -- */
+* {
+  all: unset;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0.2rem 0.5rem;
+  min-height: 0;
+  font-family: "CommitMono Nerd Font";
+  font-size: 13px;
+}
+
+/* BAR BOT */
+window.bar_bottom#waybar {
+  border: 1.2px solid #272726;
+  color: #272726;
+  background: rgba(241, 242, 246, 0.99); /* fond clair semi-transparent */
+  border-radius: 14px;
+}
+
+#workspaces button {
+  border-radius: 10px;
+  margin-left:2px;
+  margin-right:2px;
+  border: 1.2px solid transparent;
+}
+#workspaces button:hover {
+  border: 1.2px solid #272726;
+}
+#workspaces button.focused{
+  border: 1.2px solid #272726;
+  font-weight:bold;
+  background: #272726;
+  border-radius: 10px;
+  color: rgb(241, 242, 246);
+}
+
+#cava {
+  font-size: 35px;
+  color: #272726;
+}
+
+tooltip {
+  border: 1.2px solid #272726;
+  background: rgba(241, 242, 246, 0.99); /* fond clair semi-transparent */
+  border-radius: 14px;
+  color: #272726;
+}
+
+/* BAR TOP */
+window.bar_top#waybar {
+  border: 1px solid #272726;
+  color: #272726;
+  background: rgba(241, 242, 246, 0.99); /* fond clair semi-transparent */
+  border-radius: 14px;
+}
+#network,
+#bluetooth,
+#cpu,
+#memory,
+#disk,
+#custom-shutdown,
+#custom-notification,
+#battery,
+#tray {
+  border-radius: 10px;
+}
+#battery {
+  color: #443a5f;
+  background: #bbb3cb; 
+}
+#tray {
+  color: #5f2428;
+  background: #cb9ca4; 
+}
+#custom-notification {
+  color: #0f6a68;
+  background: #9dcbc9; 
+  padding-right: 9px;
+}
+#custom-shutdown {
+  color: #66743a;
+  background: #bfcb99; 
+  padding-right: 9px;
+}
+#cpu {
+  color: #67481c;
+  background: #e4b975;
+}
+#memory {
+  color: #3c4848;
+  background: #b0bcbc;
+}
+#disk {
+  color: #3a6351;
+  background: #b9d1c7 ;
+}
+#network {
+  color: #2c3e50;
+  background: #d6e3f0 ;
+}
+#bluetooth {
+  color: #623e21;
+  background: #e4d6b2;
+}
+#tray menu {
+  border: 1px solid #272726;
+  background: rgba(241, 242, 246, 0.99); /* fond clair semi-transparent */
+  border-radius: 14px;
+}
+#tray menu menuitem {
+  border: 1px solid transparent;
+  color: #272726;
+  border-radius: 14px;
+}
+#tray menu menuitem:hover {
+  border: 1px solid #272726;
+  color: rgb(241, 242, 246);
+  background: #272726; /* fond clair semi-transparent */
+}

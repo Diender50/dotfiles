@@ -1,0 +1,144 @@
+{
+ "mpris": {
+    "format": "{player_icon} {status}: {dynamic}",
+    "format-paused": "{status_icon} {status}: <i>{dynamic}</i>",
+    "player-icons": {
+      "default": "▶",
+      "mpv": "▶"
+    },
+    "status-icons": {
+      "paused": "⏸"
+    },
+    "dynamic-order": ["title", "artist"],
+    "dynamic-len": 50
+  },
+  "wireplumber": {
+    "format": "󰕾  {volume}%",
+    "format-muted": "󰝟",
+    "max-volume": 150,
+    "scroll-step": 2,
+    "on-click": "pwvucontrol",
+  },
+  "cava": {
+    "framerate": 30,
+    "autosens": 1,
+    "sensitivity": 1,
+    "bars": 25,
+    "lower_cutoff_freq": 50,
+    "higher_cutoff_freq": 10000,
+    "sleep_timer":5,
+    "hide_on_silence": true,
+    "method": "pipewire",
+    "source": "auto",
+    "stereo": true,
+    "reverse": false,
+    "bar_delimiter": 0,
+    "noise_reduction": 0.77,
+    "monstercat": true,
+    "waves": true,
+    "input_delay": 2,
+    "format-icons": ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█" ],
+    "actions": {
+      "on-click-right": "mode"
+    }
+  },
+
+  "niri/workspaces": {
+    "format": "{index}"
+},
+   "clock": {
+    "format": "{:L%a %d %b  %H:%M}",
+    "locale": "fr_FR.UTF-8",
+    "timezone": "Europe/Paris",
+    "tooltip-format": "<tt><small>{calendar}</small></tt>",
+    "calendar": {
+      "mode": "month",
+      "mode-mon-col"  : 3,
+      "weeks-pos": "right",
+        "on-scroll": 1,
+        "format": {
+          "months":     "<b>{}</b>",
+          "days":       "{}",
+          "weeks":      "<b>W{}</b>",
+          "weekdays":   "<b>{}</b>",
+          "today":      "<b><u>{}</u></b>"
+        }
+      },
+      "actions":  {
+        "on-scroll-up": "tz_up",
+        "on-scroll-down": "tz_down",
+        "on-scroll-up": "shift_up",
+        "on-scroll-down": "shift_down"
+      }
+  },
+  "battery": {
+    "format": "  {capacity}%",
+    "interval": 5,
+    "states": {
+      "warning": 20,
+      "critical": 10
+    },
+    "tooltip": false,
+    "on-double-click": "pkill waybar && waybar"
+  },
+  "tray": {
+    "icon-size": 16,
+    "spacing": 2,
+    "show-passive-items": true
+  },
+  "custom/notification": {
+    "tooltip": false,
+    "format": "{icon}",
+    "format-icons": {
+      "notification": "<span foreground='red'><sup></sup></span>",
+      "none": "",
+      "dnd-notification": "<span foreground='red'><sup></sup></span>",
+      "dnd-none": "",
+      "inhibited-notification": "<span foreground='red'><sup></sup></span>",
+      "inhibited-none": "",
+      "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
+      "dnd-inhibited-none": ""
+    },
+    "return-type": "json",
+    "exec-if": "which swaync-client",
+    "exec": "swaync-client -swb",
+    "on-click": "swaync-client -t -sw",
+    "on-click-right": "swaync-client -d -sw",
+    "escape": true
+  },
+  "custom/shutdown": {
+    "on-click": "wlogout",
+    "format": "",
+  },
+  "cpu": {
+    "interval": 2,
+    "states": {
+        "critical": 70
+    },
+    "format": "  {icon0}{icon1}{icon2}{icon3}{icon4}{icon5}{icon6}{icon7} {usage}%",
+    "format-icons": ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"],
+  },
+  "memory": {
+    "format": "  {used:0.1f}G {percentage}%",
+    "interval": 2,
+    "states": {
+      "critical": 80
+    }
+  },
+  "bluetooth": {
+    "format": " {status}",
+    "on-click": "~/.config/waybar/scripts/rofi-bluetooth &"
+  },
+  "network": {
+    "format-wifi": "  {essid} ({signalStrength}%)",
+    "format-ethernet": "󰊗  {ipaddr}/{cidr}",
+    "on-click": "~/.config/waybar/scripts/rofi-wifi &",
+    "format-disconnected": "Disconnected  ",
+  },
+  "disk": {
+    "interval": 30,
+    "format": "󱛟  {percentage_free}% libre dans {path}",
+    "path": "/",
+    "on-click": "kitty ncdu",
+  }
+}
