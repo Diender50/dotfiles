@@ -1,0 +1,147 @@
+input {
+    keyboard {
+        xkb {
+            layout "fr"
+        }
+        numlock
+    }
+    touchpad {
+        tap
+        natural-scroll
+    }
+    mouse {
+    }
+    trackpoint {
+    }
+}
+
+output "eDP-1" {
+    mode "3072x1920@60.138"
+    scale 2
+    transform "normal"
+    position x=3840 y=0
+}
+output "HDMI-A-1" {
+    mode "1920x1080@180.003006"
+    scale 1
+    transform "normal"
+    position x=1920 y=0
+}
+output "DP-5" {
+    mode "1920x1080@100.00"
+    scale 1
+    transform "normal"
+    position x=0 y=0
+}
+
+layout {
+    gaps 16
+    center-focused-column "on-overflow"
+    always-center-single-column
+    preset-column-widths {
+        proportion 0.25
+        proportion 0.5
+        proportion 0.75
+        proportion 1.0
+    }
+    default-column-width { proportion 0.5; }
+    focus-ring {
+        off
+    }
+    border {
+        width 1.5
+        active-color "#9ca1dd"
+        inactive-color "#505050"
+   }
+
+    struts {
+    }
+
+}
+layer-rule {
+    match namespace="waybar"
+    match at-startup=true
+
+    shadow {
+        off
+        softness 15
+        spread -10
+        offset x=5 y=5
+        draw-behind-window true
+        color "#505050"
+    }
+}
+spawn-at-startup "swaync"
+spawn-sh-at-startup "waypaper --restore"
+spawn-at-startup "waybar"
+spawn-sh-at-startup "~/.config/autostart/artix-pipewire-launcher"
+spawn-sh-at-startup "/usr/lib/polkit-kde-authentication-agent-1 &"
+spawn-at-startup "bash" "-c" "wl-paste --watch cliphist store &"
+spawn-at-startup "nextcloud"
+
+environment {
+    GTK_THEME "Colloid-Light"
+    QT_QPA_PLATFORMTHEME "gtk3"
+    QR_QPA_PLATFORMTHEME_QT6 "gtk3"
+}
+prefer-no-csd
+
+animations {
+}
+
+window-rule {
+    match app-id=r#"^org\.wezfurlong\.wezterm$"#
+    default-column-width {}
+}
+
+window-rule {
+    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    open-floating true
+}
+
+
+window-rule {
+    geometry-corner-radius 8
+    clip-to-geometry true
+}
+
+binds {
+    Mod+Shift+Slash { show-hotkey-overlay; }
+    Mod+T hotkey-overlay-title="Open a Terminal: kitty" { spawn "kitty"; }
+
+    Super+Shift+S { spawn-sh "grim -g  \"$(slurp -o -r -c '#ff0000ff')\" -t ppm - | satty --filename - --fullscreen --output-filename ~/Pictures/Screenshots/satty-$(date '+%Y%m%d-%H:%M:%S').png";} 
+    Alt+Tab repeat=false { toggle-overview; }
+
+    Mod+C repeat=false { close-window; }
+    Mod+R hotkey-overlay-title="Application Launcher" { spawn "rofi" "-show" "drun" "-show-icons";  }
+
+    Mod+WheelScrollDown      cooldown-ms=150 { focus-workspace-down; }
+    Mod+WheelScrollUp        cooldown-ms=150 { focus-workspace-up; }
+    Mod+Ctrl+WheelScrollDown cooldown-ms=150 { move-column-to-workspace-down; }
+    Mod+Ctrl+WheelScrollUp   cooldown-ms=150 { move-column-to-workspace-up; }
+
+    Mod+WheelScrollRight      { focus-column-right; }
+    Mod+WheelScrollLeft       { focus-column-left; }
+    Mod+Ctrl+WheelScrollRight { move-column-right; }
+    Mod+Ctrl+WheelScrollLeft  { move-column-left; }
+
+    Mod+Shift+WheelScrollDown      { focus-column-right; }
+    Mod+Shift+WheelScrollUp        { focus-column-left; }
+    Mod+Ctrl+Shift+WheelScrollDown { move-column-right; }
+    Mod+Ctrl+Shift+WheelScrollUp   { move-column-left; }
+
+    Mod+F { maximize-column; }
+    Mod+Shift+F { fullscreen-window; }
+
+    Mod+Ctrl+F { expand-column-to-available-width; }
+
+    Mod+Ctrl+C { center-visible-columns; }
+
+    XF86AudioRaiseVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+"; }
+    XF86AudioLowerVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-"; }
+    XF86MonBrightnessUp  { spawn "brightnessctl" "-q" "set" "2%+"; }
+    XF86MonBrightnessDown  { spawn "brightnessctl" "-q" "set" "2%-"; }
+    XF86AudioPlay { spawn "playerctl" "play-pause"; }
+    XF86AudioNext { spawn "playerctl" "next"; }
+    XF86AudioPrev { spawn "playerctl" "previous"; }
+}
