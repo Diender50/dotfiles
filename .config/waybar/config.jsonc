@@ -56,7 +56,7 @@
     "modules-left": [
       "cpu",
       "memory",
-      "disk"
+      "group/disks"
     ],
     "modules-center": [
       "tray",
@@ -68,5 +68,16 @@
       "custom/notification",
       "custom/shutdown"
     ],
+    "group/disks": {
+      "orientation": "inherit",
+      "drawer": {
+          "transition-duration": 500,
+          "transition-left-to-right": true,
+      },
+      "modules": [
+          "disk#home",
+          "disk#root"
+      ]
+    }
   }
 ]

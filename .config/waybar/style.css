@@ -58,7 +58,7 @@ window.bar_top#waybar {
 #bluetooth,
 #cpu,
 #memory,
-#disk,
+#disks,
 #custom-shutdown,
 #custom-notification,
 #battery,
@@ -91,9 +91,14 @@ window.bar_top#waybar {
   color: #3c4848;
   background: #b0bcbc;
 }
-#disk {
+#disks {
   color: #3a6351;
-  background: #b9d1c7 ;
+  background: #b9d1c7;
+  padding: 0rem 0.5rem;
+}
+#disk {
+  all: unset;
+  padding:0;
 }
 #network {
   color: #2c3e50;
