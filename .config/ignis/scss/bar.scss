@@ -1,0 +1,99 @@
+.bar {
+    padding: 0.2rem 1rem;
+    background-color: $bg;
+    color: $fg;
+}
+.workspaces {
+    background-color: transparent;
+    padding: 0.2rem;
+    margin: 0 0.5rem;
+    margin-left: 0;
+}
+.workspace {
+    background-color: transparent;
+    border-radius: $radius;
+    padding: 0.25rem 0.25rem 0.25rem 0.3rem;
+    transition: 0.3s;
+    margin: 0 0.25rem;
+}
+
+.workspace:hover {
+    background-color: darken($bg,10%);
+}
+
+.workspace.active {
+    background: $bg_alt;
+    font-weight: bold;
+    color: $fg_alt;
+}
+.workspace.active:hover {
+    background: lighten($bg_alt,10%);
+}
+.clock  {
+    padding: 0.25rem;
+}
+.calendar {
+    margin-top: 0.5rem;
+    background: $bg;
+    padding: 0.5rem;
+    color: $fg;
+    border-radius: $radius;
+}
+.calendar header {
+    border-bottom: 0.05rem solid $fg;
+    padding-bottom: 0.2rem;
+    margin-bottom: 0.25rem;
+}
+.calendar grid label {
+    padding: 0.2rem;
+}
+.calendar grid label.day-number {
+    color: $fg;
+    border-radius: $radius;
+    padding: 0.4rem 0.03rem 0.4rem 0.03rem;
+    margin: 0.2rem 0.1rem;
+}
+.calendar grid label.day-number:selected {
+    background-color: #7694b7; 
+    color: $fg_alt;
+    font-weight: bold;
+}
+.calendar grid label.day-number:selected:hover {
+    background-color: lighten(#7694b7,10%); 
+    color: $fg_alt;
+}
+.calendar grid label.day-number:hover {
+    background-color: #d6e3f0; 
+    color: #2c3e50;
+}
+.close {
+    background: $bg_alt;
+    color: $fg_alt;
+    padding: 0.3rem;
+    font-weight: bold;
+    border-radius: $radius;
+}
+.close:hover {
+    background-color: lighten($bg_alt,10%);
+}
+
+.tray {
+    padding: 0.25rem;
+    margin: 0 0.25rem;
+    color: #5f2428;
+    background: #cb9ca4; 
+    border-radius: $radius;
+}
+
+
+
+.menu {
+    background-color: red;
+}
+.tooltip:hover {
+    background-color: #50fa7b;
+    color: #282a36;
+}
+.menu button {
+    background-color: white;
+}

@@ -45,6 +45,11 @@ layout {
         proportion 1.0
     }
     default-column-width { proportion 0.5; }
+    preset-window-heights {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
     focus-ring {
         off
     }
@@ -90,15 +95,49 @@ animations {
 }
 
 window-rule {
-    match app-id=r#"^org\.wezfurlong\.wezterm$"#
-    default-column-width {}
+    match app-id="zen"
+    open-maximized true
 }
-
 window-rule {
-    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    match app-id="codium"
+    open-maximized true
+}
+window-rule {
+    match app-id=r#"zen$"# title="^Picture-in-Picture$"
     open-floating true
 }
-
+window-rule {
+    match at-startup=true
+    open-on-output "HDMI-A-1"
+}
+window-rule {
+    match is-floating=true
+    shadow {
+        on
+        softness 20
+        spread -10
+        offset x=0 y=0
+        draw-behind-window true
+        color "#505050"
+    }
+}
+layer-rule {
+    match namespace="ignis"
+    shadow {
+        on
+        softness 20
+        spread -10
+        offset x=0 y=0
+        draw-behind-window true
+        color "#505050"
+    }
+}
+window-rule {
+    match app-id="kitty"
+    open-floating true
+    default-column-width { fixed 580; }
+    default-window-height { fixed 370; }
+}
 
 window-rule {
     geometry-corner-radius 8

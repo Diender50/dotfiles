@@ -1,0 +1,17 @@
+$bg: #F5F5F5;
+$bg_alt: #212121;
+$bg_hover: #BDBDBD;
+$fg: #212121;
+$fg_alt: #F5F5F5;
+
+$radius: 1.5rem;
+
+* {
+    all: unset;
+    font-family: "CommitMono Nerd Font";
+    font-size: 12px;
+}
+
+
+
+@import "./scss/bar.scss"

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+max_len=34
+
+text="$(playerctl metadata title)"
+
+wrapped=$(echo "$text" | head -c $max_len)
+
+if [ "${#text}" -gt "$max_len" ]; then
+  wrapped="${wrapped}..."
+fi
+
+escape_markup() {
+  echo "$1" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'
+}
+
+escaped_text=$(escape_markup "$wrapped")
+
+echo "$escaped_text"
