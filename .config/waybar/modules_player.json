@@ -1,0 +1,74 @@
+{
+  "image#album-art": {
+     "exec":"~/.config/waybar/scripts/album-art",
+     "size": 256,
+     "interval": 2,  
+  },
+  "cava": {
+    "framerate": 30,
+    "autosens": 1,
+    "sensitivity": 1,
+    "bars": 10,
+    "lower_cutoff_freq": 50,
+    "higher_cutoff_freq": 10000,
+    "sleep_timer":5,
+    "hide_on_silence": true,
+    "method": "pipewire",
+    "source": "auto",
+    "stereo": true,
+    "reverse": false,
+    "bar_delimiter": 0,
+    "noise_reduction": 0.77,
+    "monstercat": true,
+    "waves": true,
+    "input_delay": 2,
+    "format-icons": ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█" ],
+    "actions": {
+      "on-click-right": "mode"
+    }
+  },
+  "custom/title": {
+    "exec": "~/.config/waybar/scripts/titre-art",
+    "format": "{text}",
+    "interval": 2,
+  },
+  "custom/artist": {
+    "exec": "playerctl metadata artist",
+    "format": "{text}",
+    "interval": 2,
+  },
+  "custom/next": {
+    "on-click": "playerctl next",
+    "format": "󰒭",
+  },
+  "custom/previous": {
+    "on-click": "playerctl previous",
+    "format": "󰒮",
+  },
+  "custom/pos_plus": {
+    "on-click": "playerctl position 10+",
+    "format": " "
+  },
+  "custom/pos_moins": {
+    "on-click": "playerctl position 10-",
+    "format": " "
+  },
+  "custom/play_pause": {
+    "on-click": "playerctl play-pause",
+    "format": "󰐎 "
+  },
+  "custom/horrible_blank":{
+    "format": "       "
+  },
+  "group/gestion": {
+    "orientation": "horizontal",
+    "modules": [
+        "custom/horrible_blank",
+        "custom/previous",
+        "custom/pos_moins",
+        "custom/play_pause",
+        "custom/pos_plus",
+        "custom/next"
+    ]
+  }
+}

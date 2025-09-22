@@ -6,23 +6,31 @@
     "position": "bottom",
 
     "spacing": 5,
-    "margin-bottom":10,
-    "margin-left":250,
-    "margin-right":250,
+    "margin-bottom": 0,
+    "margin-left":0,
+    "margin-right":0,
 
     "include": [
       "~/.config/waybar/modules.json",
     ],
 
     "modules-left": [
+      "niri/workspaces",
+      "mpris",
       "wireplumber",
-      "mpris"
     ],
     "modules-center": [
-      "niri/workspaces"
+      "group/middle",
     ],
     "modules-right": [
-      "clock",
+      "group/disks",
+      "group/cpus",
+      "group/memorys",
+      "battery",
+      "bluetooth",
+      "network",
+      "custom/notification",
+      "custom/shutdown"
     ],
   },
   {
@@ -30,54 +38,18 @@
     "reload_style_on_change": true,
     "layer": "bottom",
     "exclusive": false,
-    "position": "bottom",
+    "position": "left",
+    "margin-left": 18,
+    "height":2,
     "include": [
-      "~/.config/waybar/modules.json",
+      "~/.config/waybar/modules_player.json",
     ],
     "modules-center": [
-      "cava"
+      "cava",
+      "image#album-art",
+      "custom/title",
+      "custom/artist",
+      "group/gestion"
     ],
-  },
-  {
-    "name": "bar_top",
-    "reload_style_on_change": true,
-    "layer": "top",
-    "position": "top",
-
-    "spacing": 5,
-    "margin-top":10,
-    "margin-left":18,
-    "margin-right":18,
-
-    "include": [
-      "~/.config/waybar/modules.json",
-    ],
-
-    "modules-left": [
-      "cpu",
-      "memory",
-      "group/disks"
-    ],
-    "modules-center": [
-      "tray",
-    ],
-    "modules-right": [
-      "network",
-      "bluetooth",
-      "battery",
-      "custom/notification",
-      "custom/shutdown"
-    ],
-    "group/disks": {
-      "orientation": "inherit",
-      "drawer": {
-          "transition-duration": 500,
-          "transition-left-to-right": true,
-      },
-      "modules": [
-          "disk#home",
-          "disk#root"
-      ]
-    }
   }
 ]

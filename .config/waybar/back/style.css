@@ -1,65 +1,68 @@
-/* Variables */
-@define-color bg rgba (245, 245, 245, 0.99);
-@define-color fg rgb (33, 33, 33);
-
 /* -- Global rules -- */
 * {
-    all: unset;
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    min-height: 0;
-    font-family: "CommitMono Nerd Font";
-    font-size: 12px;
-    padding: 1px;
-}
-
-tooltip {
-    border: 1.2px solid @fg;
-    background: @bg; /* fond clair semi-transparent */
-    border-radius: 14px;
-    color: #272726;
+  all: unset;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0.2rem 0.5rem;
+  min-height: 0;
+  font-family: "CommitMono Nerd Font";
+  font-size: 13px;
 }
 
 /* BAR BOT */
 window.bar_bottom#waybar {
-    color: @fg;
-    background: @bg; /* fond clair semi-transparent */
+  border: 1.2px solid #272726;
+  color: #272726;
+  background: rgba(241, 242, 246, 0.99); /* fond clair semi-transparent */
+  border-radius: 14px;
 }
 
 #workspaces button {
-    border-radius: 10px;
-    margin-left:2px;
-    margin-right:2px;
-    border: 1.2px solid transparent;
+  border-radius: 10px;
+  margin-left:2px;
+  margin-right:2px;
+  border: 1.2px solid transparent;
 }
 #workspaces button:hover {
-    border: 1.2px solid @fg;
+  border: 1.2px solid #272726;
 }
 #workspaces button.focused{
-    border: 1.2px solid @fg;
-    font-weight:bold;
-    background: @fg;
-    border-radius: 10px;
-    color: @bg;
+  border: 1.2px solid #272726;
+  font-weight:bold;
+  background: #272726;
+  border-radius: 10px;
+  color: rgb(241, 242, 246);
 }
-#middle,
+
+tooltip {
+  border: 1.2px solid #272726;
+  background: rgba(241, 242, 246, 0.99); /* fond clair semi-transparent */
+  border-radius: 14px;
+  color: #272726;
+}
+
+/* BAR TOP */
+window.bar_top#waybar {
+  border: 1px solid #272726;
+  color: #272726;
+  background: rgba(241, 242, 246, 0.99); /* fond clair semi-transparent */
+  border-radius: 14px;
+}
 #pkgs,
 #network,
 #bluetooth,
-#cpus,
-#memorys,
+#cpu,
+#memory,
 #disks,
 #custom-shutdown,
 #custom-notification,
 #battery,
 #tray {
-  padding-left: 5px;
-  padding-right: 5px;
   border-radius: 10px;
 }
 #battery {
-  color: #373046;
+  color: #443a5f;
   background: #bbb3cb; 
 }
 #tray {
@@ -76,11 +79,11 @@ window.bar_bottom#waybar {
   background: #bfcb99; 
   padding-right: 9px;
 }
-#cpus {
+#cpu {
   color: #67481c;
   background: #e4b975;
 }
-#memorys {
+#memory {
   color: #3c4848;
   background: #b0bcbc;
 }
@@ -120,10 +123,7 @@ window.bar_bottom#waybar {
   color: rgb(241, 242, 246);
   background: #272726; /* fond clair semi-transparent */
 }
-#middle {
-    background: #b0bcbc;
-    color: #3c4848;
-}
+
 /* MUSIC PLAYER */
 window.bar_cava *{
   all: unset;

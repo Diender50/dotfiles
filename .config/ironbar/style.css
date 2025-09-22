@@ -1,0 +1,112 @@
+@define-color bg #F5F5F5;
+@define-color bg_alt #212121;
+@define-color fg #212121;
+@define-color fg_alt #F5F5F5;
+
+/* -- base styles -- */
+
+* {
+    all: unset;
+    font-family: CommitMono Nerd Font;
+    font-size: 12px;
+}
+
+#bottom_bar {
+    background: @bg;
+}
+.container {
+    padding: 0.1rem 0rem;
+    margin: 0rem 0.1rem;
+}
+.widget{
+    color: @fg;
+}
+.workspaces .item {
+    padding: 0.25rem;
+    margin: 0rem 0.2rem;
+    border-radius: 1rem;
+}
+.workspaces .item:hover{
+    transition: 0.75s ease-in-out 0.1s;
+    background: #E0E0E0;
+}
+.workspaces .item.focused{
+    background: @bg_alt;
+    color: @fg_alt;
+    font-weight: bold;
+}
+.workspaces .item.focused:hover{
+    transition: 0.75s ease-in-out 0.1s;
+    background: #424242;
+}
+.popup,
+.popup-clock {
+    background: @bg;
+    color: @fg;
+    padding: 0.5rem;
+    border-radius: 2rem;
+}
+
+.power-menu{
+    color: #66743a;
+    background: #bfcb99; 
+    border-radius: 1rem;
+}
+.power-menu #power-btn2 {
+    padding-right: 0.55rem;
+    padding-left: 0.4rem;
+}
+
+.power-menu #power-btn {
+    color: @fg;
+    background-color: @bg;
+}
+
+.power-menu #power-btn:hover {
+    background-color: @bg;
+}
+
+.popup-power-menu {
+    padding: 1rem;
+    border-radius: 2rem;
+}
+
+.popup-power-menu .power-btn {
+    color: @fg;
+    background-color: @bg;
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+    padding-left:  1.20rem;
+    padding-right: 2rem;
+    border-radius: 1rem;
+}
+
+.popup-power-menu .power-btn:hover {
+    transition: 0.75s ease-in-out 0.1s;
+    background: #E0E0E0;
+}
+
+.notifications .button {
+    margin-right: 0.4rem;
+    color: #66743a;
+    background: #bfcb99; 
+    padding-right: 0.75rem;
+    padding-left: 0.4rem;
+    border-radius: 1rem;
+}
+.notifications .count {
+    color: red;
+    font-size: 8px;
+    font-weight: 900;
+    margin-right: 0.7rem;
+    margin-top: 0.1rem;
+}
+
+.tray {
+    margin-right: 0.4rem;
+    color: #66743a;
+    background: #bfcb99; 
+    padding-right: 0.4rem;
+    padding-left: 0.4rem;
+    border-radius: 1rem;
+}

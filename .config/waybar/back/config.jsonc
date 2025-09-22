@@ -1,0 +1,98 @@
+[
+  {
+    "name": "bar_bottom",
+    "reload_style_on_change": true,
+    "layer": "top",
+    "position": "bottom",
+
+    "spacing": 5,
+    "margin-bottom":10,
+    "margin-left":250,
+    "margin-right":250,
+
+    "include": [
+      "~/.config/waybar/modules.json",
+    ],
+
+    "modules-left": [
+      "wireplumber",
+      "mpris",
+    ],
+    "modules-center": [
+      "niri/workspaces"
+    ],
+    "modules-right": [
+      "clock",
+      "custom/weather"
+    ],
+  },
+  {
+    "name": "bar_cava",
+    "reload_style_on_change": true,
+    "layer": "bottom",
+    "exclusive": false,
+    "position": "left",
+    "margin-left": 18,
+    "height":2,
+    "include": [
+      "~/.config/waybar/modules_player.json",
+    ],
+    "modules-center": [
+      "cava",
+      "image#album-art",
+      "custom/title",
+      "custom/artist",
+      "group/gestion"
+    ],
+  },
+  {
+    "name": "bar_top",
+    "reload_style_on_change": true,
+    "layer": "top",
+    "position": "top",
+
+    "spacing": 5,
+    "margin-top":10,
+    "margin-left":18,
+    "margin-right":18,
+
+    "include": [
+      "~/.config/waybar/modules.json",
+    ],
+
+    "modules-left": [
+      "cpu",
+      "memory",
+      "group/disks"
+    ],
+    "modules-center": [
+      "tray",
+      "group/pkgs"
+    ],
+    "modules-right": [
+      "network",
+      "bluetooth",
+      "battery",
+      "custom/notification",
+      "custom/shutdown"
+    ],
+    "group/disks": {
+      "orientation": "inherit",
+      "drawer": {
+          "transition-duration": 500,
+          "transition-left-to-right": true,
+      },
+      "modules": [
+          "disk#home",
+          "disk#root"
+      ]
+    },
+    "group/pkgs": {
+      "orientation": "inherit",
+      "modules": [
+          "custom/pacman",
+          "custom/pkg-aur"
+      ]
+    }
+  }
+]
