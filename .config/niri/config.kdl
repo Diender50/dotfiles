@@ -79,15 +79,19 @@ layer-rule {
 //spawn-at-startup "swaync"
 //spawn-sh-at-startup "waypaper --restore"
 //spawn-at-startup "waybar"
-spawn-sh-at-startup "pipewire"
-//spawn-sh-at-startup "/usr/lib/polkit-kde-authentication-agent-1 &"
-//spawn-at-startup "bash" "-c" "wl-paste --watch cliphist store &"
-//spawn-at-startup "nextcloud"
+spawn-at-startup "/usr/libexec/polkit-mate-authentication-agent-1"
+spawn-at-startup "bash" "-c" "wl-paste --watch cliphist store &"
+spawn-at-startup "nextcloud"
+spawn-at-startup "xwayland-satellite"
 
 environment {
     GTK_THEME "Colloid-Light"
     QT_QPA_PLATFORMTHEME "gtk3"
     QR_QPA_PLATFORMTHEME_QT6 "gtk3"
+    DISPLAY ":0"
+    XDG_CURRENT_DESKTOP "niri"
+    XDG_SESSION_TYPE "wayland"
+    XDG_SESSION_DESKTOP "niri"
 }
 prefer-no-csd
 
@@ -96,6 +100,7 @@ animations {
 
 window-rule {
     match app-id="zen"
+    match app-id="floorp"
     open-maximized true
 }
 window-rule {
@@ -103,6 +108,7 @@ window-rule {
     open-maximized true
 }
 window-rule {
+    match app-id=r#"floorp$"# title="^Picture-in-Picture$"
     match app-id=r#"zen$"# title="^Picture-in-Picture$"
     open-floating true
 }
@@ -132,6 +138,7 @@ layer-rule {
         color "#505050"
     }
 }
+
 window-rule {
     match app-id="kitty"
     open-floating true
@@ -149,6 +156,8 @@ binds {
     Mod+T hotkey-overlay-title="Open a Terminal: kitty" { spawn "kitty"; }
 
     Super+Shift+S { spawn-sh "grim -g  \"$(slurp -o -r -c '#ff0000ff')\" -t ppm - | satty --filename - --fullscreen --output-filename ~/Pictures/Screenshots/satty-$(date '+%Y%m%d-%H:%M:%S').png";} 
+    Super+Shift+X { spawn-sh "~/.scripts/wgifcap";} 
+
     Alt+Tab repeat=false { toggle-overview; }
 
     Mod+C repeat=false { close-window; }

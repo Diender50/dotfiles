@@ -1,12 +1,12 @@
 [Application]
-WindowWidth = 780
-WindowHeight = 917
+WindowWidth = 1000
+WindowHeight = 800
 LastCheckedVersion = 'v0.18.1'
 LastLaunchedVersion = 'v0.18.1'
 EnableSystemTray = true
 CloseToSystemTray = false
 StartupPage = 'Albums'
-SettingsTab = 'Playback'
+SettingsTab = 'Equalizer'
 AllowMultiInstance = false
 MaxImageCacheSizeMB = 50
 SavePlayQueue = true
@@ -19,7 +19,7 @@ CustomLrcLibUrl = ''
 EnablePasswordStorage = true
 SkipSSLVerify = false
 EnqueueBatchSize = 100
-Language = 'fr'
+Language = 'auto'
 DisableDPIDetection = false
 EnableAutoUpdateChecker = true
 RequestTimeoutSeconds = 15
@@ -34,7 +34,7 @@ Hostname = 'https://music.kione.ovh'
 AltHostname = ''
 Username = 'Samuel'
 LegacyAuth = false
-ID = '0e7b7de8-f8f5-46d3-bb5b-939ab98221a1'
+ID = 'a1947906-461a-4266-8a85-6b58c5323bae'
 Nickname = 'Kione'
 Default = true
 SelectedLibrary = ''
@@ -62,7 +62,7 @@ TracklistColumns = ['Album', 'Time', 'Plays']
 ShowAlbumYears = false
 
 [GridView]
-CardSize = 260.0
+CardSize = 200.0
 
 [PlaylistPage]
 TracklistColumns = ['Album', 'Time', 'Plays']
@@ -82,7 +82,7 @@ RepeatMode = 'None'
 UseWaveformSeekbar = true
 
 [LocalPlayback]
-AudioDeviceName = 'auto'
+AudioDeviceName = 'alsa/pipewire'
 AudioExclusive = false
 InMemoryCacheSizeMB = 30
 Volume = 100
@@ -107,8 +107,8 @@ Codec = 'opus'
 MaxBitRateKBPS = 160
 
 [Theme]
-ThemeFile = 'catppuccin-modified.toml'
-Appearance = 'Light'
+ThemeFile = ''
+Appearance = 'Dark'
 
 [PeakMeter]
 WindowHeight = 100

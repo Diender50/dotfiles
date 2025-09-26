@@ -1,0 +1,116 @@
+// https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/theme/Adwaita/_colors-public.scss
+$fg-color: #{"@theme_fg_color"};
+$bg-color: #{"@theme_bg_color"};
+$radius-bar: 2rem;
+$radius-popup: 1rem;
+$f-family: "CommitMono Nerd Font";
+$f-size: 12px;
+
+
+//widgets colors
+$clock-bg-color: #b0bcbc;
+$clock-fg-color: #3c4848;
+
+$battery-bg-color: #373046;
+$battery-fg-color: #bbb3cb;
+
+$volume-bg-color: #e4b975;
+$volume-fg-color: #7b5a2a;
+
+window.Bar {
+  background: transparent;
+  color: $fg-color;
+  font-family: $f-family;
+  font-size: $f-size;
+  font-weight: normal;
+  > centerbox {
+    background: $bg-color;
+    padding: 0.1rem 0.5rem;
+  }
+
+  // Menus des buttons
+  popover contents {
+    background:  $bg-color;
+    border: 0;
+    border-radius: $radius-popup;
+    padding: 0.5rem;
+  }
+  popover arrow {
+    all: unset;
+  }
+
+  box,
+  button {
+    border-radius: $radius-bar;
+    padding: 0rem 0.4rem;
+    font-weight: normal;
+    font-family: $f-family;
+    font-size: $f-size;
+  }
+
+  // Clock
+  .clock popover contents,
+  .clock calendar,
+  .clock button{
+    background: $clock-bg-color;
+    color: $clock-fg-color;
+  }
+  .clock button:hover {
+    background: darken($clock-bg-color,10%);
+  }
+  .clock button:checked {
+    background: $clock-fg-color;
+    color: $bg-color;
+  }
+  .clock calendar header button,
+  .clock calendar grid label {
+    border-radius: 0.5rem;
+  }
+  .clock calendar grid label:hover {
+    background: darken($clock-bg-color,10%);
+  }
+  .clock calendar grid label:selected {
+    background: $clock-fg-color;
+  }
+
+  // Battery
+  .battery {
+    color: $battery-bg-color;
+    background: $battery-fg-color; 
+  }
+
+  // Volume
+  .volume popover contents,
+  .volume button{
+    background: $volume-bg-color;
+    color: $volume-fg-color;
+  }
+  .volume button:hover {
+    background: darken($volume-bg-color,10%);
+  }
+  .volume button:checked {
+    background: $volume-fg-color;
+    color: $bg-color;
+  }
+
+  .volume popover trough {
+    all: unset;
+    background-color: lighten($volume-fg-color,5%);
+    min-height: 1.4rem;
+    border-radius: 0.5rem;
+  }
+  .volume popover trough slider {
+    all: unset;
+  }
+  .volume popover trough highlight {
+    all: unset;
+    background:  lighten($volume-fg-color,20%);
+  }
+  .volume popover button {
+    padding: 0rem 0.25rem;
+  }
+  .volume popover button:hover {
+    background: transparent;
+    color: lighten($volume-fg-color,10%);
+  }
+}
