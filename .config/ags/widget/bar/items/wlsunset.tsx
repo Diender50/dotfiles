@@ -165,7 +165,6 @@ export function WlSunset() {
                     marginBottom={8}
                     marginStart={8}
                     marginEnd={8}
-                    widthRequest={250}
                 >
                     {/* Header avec switch */}
                     <box orientation={Gtk.Orientation.HORIZONTAL} spacing={8}>
@@ -286,7 +285,7 @@ export function WlSunset() {
                                         saveConfig()
                                     }
                                 }}
-                                maxWidthChars={11}
+                                maxWidthChars={12}
                             />
                             <entry
                                 text={longitude(lng => lng.toString())}
@@ -299,7 +298,7 @@ export function WlSunset() {
                                         saveConfig()
                                     }
                                 }}
-                                maxWidthChars={11}
+                                maxWidthChars={12}
                             />
                         </box>
 

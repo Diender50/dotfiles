@@ -7,7 +7,7 @@ import {
     icons,
     VolumeIcon,
     MicroIcon,
-} from "../../../../ags/src/lib/icons";
+} from "../../../src/lib/icons";
 
 export function Audio() {
     const wp = AstalWp.get_default()!

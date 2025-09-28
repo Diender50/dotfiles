@@ -7,7 +7,7 @@ import { createBinding } from "ags"
 import {
    icons,
    BatteryIcon,
-} from "../../../../ags/src/lib/icons";
+} from "../../../src/lib/icons";
 
 export function Battery() {
   const battery = AstalBattery.get_default()
