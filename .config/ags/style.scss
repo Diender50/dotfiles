@@ -1,13 +1,18 @@
-// https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/theme/Adwaita/_colors-public.scss
+@use 'sass:color';
+
+// ============================================================================
+// VARIABLES GLOBALES
+// ============================================================================
 $fg-color: #{"@theme_fg_color"};
 $bg-color: #{"@theme_bg_color"};
+
+// Layout
 $radius-bar: 2rem;
 $radius-popup: 1rem;
 $f-family: "CommitMono Nerd Font";
 $f-size: 12px;
 
-
-//widgets colors
+// Couleurs des widgets
 $clock-bg-color: #b0bcbc;
 $clock-fg-color: #3c4848;
 
@@ -17,28 +22,67 @@ $battery-fg-color: #bbb3cb;
 $volume-bg-color: #e4b975;
 $volume-fg-color: #7b5a2a;
 
+$network-bg-color: #d6e3f0;
+$network-fg-color: #304255;
+
+$bluetooth-bg-color: #98b9ff;
+$bluetooth-fg-color: #2d3864;
+
+$tray-bg-color: #cb9ca4;
+$tray-fg-color: #5c2226;
+
+// ============================================================================
+// MIXINS
+// ============================================================================
+@mixin widget-colors($bg, $fg) {
+  background: $bg;
+  color: $fg;
+  
+  &:hover {
+    background: color.scale($bg, $lightness: -14%);
+  }
+  
+  &:checked {
+    background: $fg;
+    color: $bg-color;
+  }
+}
+
+@mixin popover-button($bg) {
+  background: color.scale($bg, $lightness: -5%);
+  padding: 0rem 0.5rem;
+  
+  &:hover {
+    background: color.scale($bg, $lightness: -14%);
+  }
+}
+
+@mixin switch-colors($bg, $fg) {
+  &:checked {
+    background: $fg;
+  }
+
+  slider {
+    background: $bg;
+  }
+}
+
+// ============================================================================
+// STYLES PRINCIPAUX
+// ============================================================================
 window.Bar {
   background: transparent;
   color: $fg-color;
   font-family: $f-family;
   font-size: $f-size;
   font-weight: normal;
+
   > centerbox {
     background: $bg-color;
     padding: 0.1rem 0.5rem;
   }
 
-  // Menus des buttons
-  popover contents {
-    background:  $bg-color;
-    border: 0;
-    border-radius: $radius-popup;
-    padding: 0.5rem;
-  }
-  popover arrow {
-    all: unset;
-  }
-
+  // ===== STYLES COMMUNS =====
   box,
   button {
     border-radius: $radius-bar;
@@ -46,71 +90,315 @@ window.Bar {
     font-weight: normal;
     font-family: $f-family;
     font-size: $f-size;
+    
+    &:focus {
+      outline: 0;
+    }
   }
 
-  // Clock
-  .clock popover contents,
-  .clock calendar,
-  .clock button{
-    background: $clock-bg-color;
-    color: $clock-fg-color;
-  }
-  .clock button:hover {
-    background: darken($clock-bg-color,10%);
-  }
-  .clock button:checked {
-    background: $clock-fg-color;
-    color: $bg-color;
-  }
-  .clock calendar header button,
-  .clock calendar grid label {
-    border-radius: 0.5rem;
-  }
-  .clock calendar grid label:hover {
-    background: darken($clock-bg-color,10%);
-  }
-  .clock calendar grid label:selected {
-    background: $clock-fg-color;
+  // ===== POPOVERS =====
+  popover {
+    contents {
+      background: $bg-color;
+      border: 0;
+      border-radius: $radius-popup;
+      
+      // Pas de hover sur les contents de popover
+      &:hover {
+        background: $bg-color;
+      }
+    }
+    
+    arrow {
+      all: unset;
+    }
   }
 
-  // Battery
+  // ===== CLOCK =====
+  .clock {
+    popover contents,
+    calendar,
+    button {
+      font-family: $f-family;
+      font-size: $f-size;
+      background: $clock-bg-color;
+      color: $clock-fg-color;
+    }
+
+    button {
+      &:hover {
+        background: color.scale($clock-bg-color, $lightness: -14%);
+      }
+      
+      &:checked {
+        background: $clock-fg-color;
+        color: $bg-color;
+      }
+    }
+
+    // Override spécifique pour le popover clock
+    popover contents {
+      background: $clock-bg-color;
+      
+      &:hover {
+        background: $clock-bg-color;
+      }
+    }
+
+    // Override spécifique pour le calendar
+    calendar {
+      background: $clock-bg-color;
+      
+      &:hover {
+        background: $clock-bg-color;
+      }
+
+      header button,
+      grid label {
+        border-radius: 0.5rem;
+      }
+      
+      grid label {
+        &:hover {
+          background: color.scale($clock-bg-color, $lightness: -14%);
+        }
+        
+        &:selected {
+          background: $clock-fg-color;
+        }
+      }
+    }
+  }
+
+  // ===== BATTERY =====
   .battery {
     color: $battery-bg-color;
-    background: $battery-fg-color; 
+    background: $battery-fg-color;
   }
 
-  // Volume
-  .volume popover contents,
-  .volume button{
-    background: $volume-bg-color;
-    color: $volume-fg-color;
-  }
-  .volume button:hover {
-    background: darken($volume-bg-color,10%);
-  }
-  .volume button:checked {
-    background: $volume-fg-color;
-    color: $bg-color;
+  // ===== VOLUME =====
+  .volume {
+    popover contents,
+    button {
+      background: $volume-bg-color;
+      color: $volume-fg-color;
+    }
+
+    button {
+      &:hover {
+        background: color.scale($volume-bg-color, $lightness: -14%);
+      }
+      
+      &:checked {
+        background: $volume-fg-color;
+        color: $bg-color;
+      }
+    }
+
+    // Override spécifique pour le popover volume
+    popover contents {
+      background: $volume-bg-color;
+      
+      &:hover {
+        background: $volume-bg-color;
+      }
+    }
+
+    popover {
+      trough {
+        all: unset;
+        background-color: color.scale($volume-fg-color, $lightness: 7.4%);
+        min-height: 1.4rem;
+        border-radius: 0.5rem;
+
+        slider {
+          all: unset;
+        }
+
+        highlight {
+          all: unset;
+          background: color.scale($volume-fg-color, $lightness: 29.5%);
+        }
+      }
+
+      button {
+        background: transparent;
+        padding: 0rem 0.25rem;
+
+        &:hover {
+          background: transparent;
+          color: color.scale($volume-fg-color, $lightness: 14%);
+        }
+      }
+    }
   }
 
-  .volume popover trough {
-    all: unset;
-    background-color: lighten($volume-fg-color,5%);
-    min-height: 1.4rem;
-    border-radius: 0.5rem;
+  // ===== AUDIO SELECTOR =====
+  .audio-selector-button {
+    button:checked {
+      background: transparent;
+    }
+
+    box {
+      background: color.scale($volume-bg-color, $lightness: -5%);
+
+      &:hover {
+        background: color.scale($volume-bg-color, $lightness: -14%);
+      }
+    }
+
+    popover {
+      box {
+        background: transparent;
+
+        &:hover {
+          background: transparent;
+        }
+      }
+
+      button {
+        background: color.scale($volume-bg-color, $lightness: -5%);
+        padding: 0rem 0.5rem;
+        
+        &:hover {
+          background: color.scale($volume-bg-color, $lightness: -14%);
+          color: inherit;
+        }
+      }
+    }
   }
-  .volume popover trough slider {
-    all: unset;
+
+  // ===== NETWORK =====
+  .network {
+    popover contents,
+    button {
+      background: $network-bg-color;
+      color: $network-fg-color;
+    }
+
+    button {
+      &:hover {
+        background: color.scale($network-bg-color, $lightness: -14%);
+      }
+      
+      &:checked {
+        background: $network-fg-color;
+        color: $bg-color;
+      }
+    }
+
+    // Override spécifique pour le popover network
+    popover contents {
+      background: $network-bg-color;
+      
+      &:hover {
+        background: $network-bg-color;
+      }
+    }
+
+    popover {
+      button {
+        background: color.scale($network-bg-color, $lightness: -5%);
+        padding: 0rem 0.5rem;
+        
+        &:hover {
+          background: color.scale($network-bg-color, $lightness: -14%);
+        }
+      }
+
+      switch {
+        &:checked {
+          background: $network-fg-color;
+        }
+
+        slider {
+          background: $network-bg-color;
+        }
+      }
+    }
   }
-  .volume popover trough highlight {
-    all: unset;
-    background:  lighten($volume-fg-color,20%);
+
+  // ===== BLUETOOTH =====
+  .bluetooth {
+    popover contents,
+    button {
+      background: $bluetooth-bg-color;
+      color: $bluetooth-fg-color;
+    }
+
+    button {
+      &:hover {
+        background: color.scale($bluetooth-bg-color, $lightness: -14%);
+      }
+      
+      &:checked {
+        background: $bluetooth-fg-color;
+        color: $bg-color;
+      }
+    }
+
+    // Override spécifique pour le popover bluetooth
+    popover contents {
+      background: $bluetooth-bg-color;
+      
+      &:hover {
+        background: $bluetooth-bg-color;
+      }
+    }
+
+    popover {
+      button {
+        background: color.scale($bluetooth-bg-color, $lightness: -5%);
+        padding: 0rem 0.5rem;
+        
+        &:hover {
+          background: color.scale($bluetooth-bg-color, $lightness: -14%);
+        }
+      }
+
+      switch {
+        &:checked {
+          background: $bluetooth-fg-color;
+        }
+
+        slider {
+          background: $bluetooth-bg-color;
+        }
+      }
+    }
   }
-  .volume popover button {
-    padding: 0rem 0.25rem;
-  }
-  .volume popover button:hover {
-    background: transparent;
-    color: lighten($volume-fg-color,10%);
+
+  // ===== TRAY =====
+  .tray {
+    background: $tray-bg-color;
+    color: $tray-fg-color;
+
+    button {
+      background: transparent;
+      padding: 0;
+    }
+
+    popover {
+      contents {
+        padding: 0.5rem 0rem;
+        color: $tray-fg-color;
+        background: $tray-bg-color;
+
+        &:hover {
+          background: $tray-bg-color;
+        }
+      }
+
+      modelbutton {
+        background-color: color.scale($tray-bg-color, $lightness: -5%);
+        margin: 3px 0;
+        border-radius: $radius-popup;
+        padding: 0 0.5rem 0 0;
+
+        &:hover {
+          background-color: color.scale($tray-bg-color, $lightness: -14%);
+        }
+      }
+    }
   }
 }

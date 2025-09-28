@@ -76,6 +76,8 @@ layer-rule {
         color "#505050"
     }
 }
+
+spawn-at-startup "~/.config/autostart/start-pipewire.sh"
 //spawn-at-startup "swaync"
 //spawn-sh-at-startup "waypaper --restore"
 //spawn-at-startup "waybar"

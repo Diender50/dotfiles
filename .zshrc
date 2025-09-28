@@ -103,5 +103,5 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 export SHELL=/bin/zsh
-ufetch
+~/.local/bin/diyfetch 
 source <(fzf --zsh)
