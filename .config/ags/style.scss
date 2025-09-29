@@ -1,10 +1,11 @@
 @use 'sass:color';
 
 // ============================================================================
-// VARIABLES GLOBALES
+// VARIABLES GLOBALES  
 // ============================================================================
 $fg-color: #{"@theme_fg_color"};
 $bg-color: #{"@theme_bg_color"};
+$error: red;
 
 // Layout
 $radius-bar: 2rem;
@@ -34,17 +35,37 @@ $tray-fg-color: #5c2226;
 $wlsunset-bg-color: #f3d58d;
 $wlsunset-fg-color: #85652c;
 
+$mpris-bg-color: #826c57;
+$mpris-fg-color: #3c2b7a;
+
+$weather-bg-color: #9dcbc9;
+$weather-fg-color: #126c6a;
+
+$powermenu-bg-color: #bfcb99;
+$powermenu-fg-color: #66743a;
+
+$updates-bg-color: #cfc4b8;
+$updates-fg-color: #6e4f41;
+
+$applauncher-bg-color: #b9d1c7;
+$applauncher-fg-color: #3d6654;
+
+// Wallpaper Carousel
+$wallpaper-carousel-bg-color: rgba(0, 0, 0, 0.9);
+$wallpaper-carousel-fg-color: white;
+$wallpaper-carousel-accent-color: #00aaff;
+
 // ============================================================================
 // MIXINS
 // ============================================================================
 @mixin widget-colors($bg, $fg) {
   background: $bg;
   color: $fg;
-  
+
   &:hover {
     background: color.scale($bg, $lightness: -14%);
   }
-  
+
   &:checked {
     background: $fg;
     color: $bg-color;
@@ -54,7 +75,7 @@ $wlsunset-fg-color: #85652c;
 @mixin popover-button($bg) {
   background: color.scale($bg, $lightness: -5%);
   padding: 0rem 0.5rem;
-  
+
   &:hover {
     background: color.scale($bg, $lightness: -14%);
   }
@@ -80,7 +101,7 @@ window.Bar {
   font-size: $f-size;
   font-weight: normal;
 
-  > centerbox {
+  >centerbox {
     background: $bg-color;
     padding: 0.1rem 0.5rem;
   }
@@ -93,7 +114,7 @@ window.Bar {
     font-weight: normal;
     font-family: $f-family;
     font-size: $f-size;
-    
+
     &:focus {
       outline: 0;
     }
@@ -101,21 +122,21 @@ window.Bar {
 
   // ===== POPOVERS =====
   popover {
-      scale {
-        padding: 0.4rem 0.2rem;
-      }
+    scale {
+      padding: 0.4rem 0.2rem;
+    }
 
     contents {
       background: $bg-color;
       border: 0;
       border-radius: $radius-popup;
-      
+
       // Pas de hover sur les contents de popover
       &:hover {
         background: $bg-color;
       }
     }
-    
+
     arrow {
       all: unset;
     }
@@ -123,6 +144,7 @@ window.Bar {
 
   // ===== CLOCK =====
   .clock {
+
     popover contents,
     calendar,
     button {
@@ -136,7 +158,7 @@ window.Bar {
       &:hover {
         background: color.scale($clock-bg-color, $lightness: -14%);
       }
-      
+
       &:checked {
         background: $clock-fg-color;
         color: $bg-color;
@@ -146,7 +168,7 @@ window.Bar {
     // Override spécifique pour le popover clock
     popover contents {
       background: $clock-bg-color;
-      
+
       &:hover {
         background: $clock-bg-color;
       }
@@ -155,7 +177,7 @@ window.Bar {
     // Override spécifique pour le calendar
     calendar {
       background: $clock-bg-color;
-      
+
       &:hover {
         background: $clock-bg-color;
       }
@@ -164,12 +186,12 @@ window.Bar {
       grid label {
         border-radius: 0.5rem;
       }
-      
+
       grid label {
         &:hover {
           background: color.scale($clock-bg-color, $lightness: -14%);
         }
-        
+
         &:selected {
           background: $clock-fg-color;
         }
@@ -185,6 +207,7 @@ window.Bar {
 
   // ===== VOLUME =====
   .volume {
+
     popover contents,
     button {
       background: $volume-bg-color;
@@ -195,7 +218,7 @@ window.Bar {
       &:hover {
         background: color.scale($volume-bg-color, $lightness: -14%);
       }
-      
+
       &:checked {
         background: $volume-fg-color;
         color: $bg-color;
@@ -205,7 +228,7 @@ window.Bar {
     // Override spécifique pour le popover volume
     popover contents {
       background: $volume-bg-color;
-      
+
       &:hover {
         background: $volume-bg-color;
       }
@@ -266,7 +289,7 @@ window.Bar {
       button {
         background: color.scale($volume-bg-color, $lightness: -5%);
         padding: 0rem 0.5rem;
-        
+
         &:hover {
           background: color.scale($volume-bg-color, $lightness: -14%);
           color: inherit;
@@ -277,6 +300,7 @@ window.Bar {
 
   // ===== NETWORK =====
   .network {
+
     popover contents,
     button {
       background: $network-bg-color;
@@ -287,7 +311,7 @@ window.Bar {
       &:hover {
         background: color.scale($network-bg-color, $lightness: -14%);
       }
-      
+
       &:checked {
         background: $network-fg-color;
         color: $bg-color;
@@ -297,7 +321,7 @@ window.Bar {
     // Override spécifique pour le popover network
     popover contents {
       background: $network-bg-color;
-      
+
       &:hover {
         background: $network-bg-color;
       }
@@ -307,7 +331,7 @@ window.Bar {
       button {
         background: color.scale($network-bg-color, $lightness: -5%);
         padding: 0rem 0.5rem;
-        
+
         &:hover {
           background: color.scale($network-bg-color, $lightness: -14%);
         }
@@ -327,6 +351,7 @@ window.Bar {
 
   // ===== BLUETOOTH =====
   .bluetooth {
+
     popover contents,
     button {
       background: $bluetooth-bg-color;
@@ -337,7 +362,7 @@ window.Bar {
       &:hover {
         background: color.scale($bluetooth-bg-color, $lightness: -14%);
       }
-      
+
       &:checked {
         background: $bluetooth-fg-color;
         color: $bg-color;
@@ -347,7 +372,7 @@ window.Bar {
     // Override spécifique pour le popover bluetooth
     popover contents {
       background: $bluetooth-bg-color;
-      
+
       &:hover {
         background: $bluetooth-bg-color;
       }
@@ -357,7 +382,7 @@ window.Bar {
       button {
         background: color.scale($bluetooth-bg-color, $lightness: -5%);
         padding: 0rem 0.5rem;
-        
+
         &:hover {
           background: color.scale($bluetooth-bg-color, $lightness: -14%);
         }
@@ -408,8 +433,10 @@ window.Bar {
       }
     }
   }
+
   // ===== WLSUNSET =====
   .wlsunset {
+
     popover contents,
     button {
       background: $wlsunset-bg-color;
@@ -420,7 +447,7 @@ window.Bar {
       &:hover {
         background: color.scale($wlsunset-bg-color, $lightness: -14%);
       }
-      
+
       &:checked {
         background: $wlsunset-fg-color;
         color: $bg-color;
@@ -429,7 +456,8 @@ window.Bar {
 
     // Override spécifique pour le popover wlsunset
     popover contents {
-      background: $wlsunset-bg-color;      
+      background: $wlsunset-bg-color;
+
       &:hover {
         background: $wlsunset-bg-color;
       }
@@ -441,6 +469,7 @@ window.Bar {
         background-color: color.scale($wlsunset-fg-color, $lightness: 7.4%);
         min-height: 1.4rem;
         border-radius: 0.5rem;
+
         slider {
           all: unset;
         }
@@ -450,10 +479,11 @@ window.Bar {
           background: color.scale($wlsunset-fg-color, $lightness: 29.5%);
         }
       }
+
       button {
         background: color.scale($wlsunset-bg-color, $lightness: -5%);
         padding: 0rem 0.5rem;
-        
+
         &:hover {
           background: color.scale($wlsunset-bg-color, $lightness: -14%);
         }
@@ -470,108 +500,521 @@ window.Bar {
       }
     }
   }
-    // ===== MPRIS =====
-.mpris {
-  color: $bg-color;
-  padding: 0;
-  box,
-  popover box,
-  popover,
-  popover contents  {
-    border-radius: $radius-bar;
-    padding: 0;
-  }
 
-  popover contents {
+  // ===== MPRIS =====
+  .mpris {
     color: $bg-color;
-    border-radius: $radius-bar+0.75rem;
-    padding: 0.75rem;
-    background-color: color.scale(black,$alpha: -25%);
-  }
-
-
-  button {
-    background: transparent;
-    border-radius: 50%;
+    background-color: $mpris-bg-color;
     padding: 0;
-    color: $bg-color;
 
-    &:hover {
-      background: transparent;
+    box,
+    popover box,
+    popover,
+    popover contents {
+      border-radius: $radius-bar;
+      padding: 0;
     }
-    
-    &:checked {
-      background: transparent;
+
+    popover contents {
+      color: $bg-color;
+      border-radius: $radius-bar+0.75rem;
+      padding: 0.75rem;
+      background-color: color.scale(black, $alpha: -25%);
     }
-  }
-  .titre-button {
-    margin-left: 0.5rem;
-    padding: 0 0.2rem;
-    background: color.scale(black,$alpha: -40%);
-    border-radius: $radius-popup;
-  }
-  .titre-button:hover {
-    background: color.scale(black,$alpha: -40%,$lightness: 15%);
-  }
-  .titre-button:checked {
-    background: color.scale(black,$alpha: -40%,$lightness: 15%);
-  }
 
-  .external-button {
-    background: color.scale(black,$alpha: -40%);
-    border-radius: 50%;
-    padding: 0;
-    color: $bg-color;
-
-    &:hover {
-      background: color.scale(black,$alpha: -40%,$lightness: 15%);
-    }
-    
-    &:checked {
-      background: color.scale(black,$alpha: -40%,$lightness: 15%);
-    }
-  }
-
-
-  .cover-pop {
-    box-shadow: 0px 0px 15px -5px #000000;
-  }
-  .inside-cover {
-    padding: 0.7rem;
-  }
-  .titres {
-    border-radius: $radius-popup;
-    padding: 0.4rem;
-    background: color.scale(black,$alpha: -40%);
-  }
-
-  popover {
-    
-    trough {
-      all: unset;
-      background: color.scale(black,$alpha: -40%);
-      min-height: 0.25rem;
-      border-radius: 0.5rem;
-      opacity: 1;
-      slider {
-        all: unset;
-      }
-
-      highlight {
-        all: unset;
-        border-radius: 0.5rem;
-        background: white;
-      }
-    }
-    
     button {
-      background: color.scale(black,$alpha: -40%);
-      padding: 0.4rem;
+      background: transparent;
+      border-radius: 50%;
+      padding: 0;
+      color: $bg-color;
+
       &:hover {
-        background: color.scale(black,$alpha: -40%,$lightness: 15%);
+        background: transparent;
+      }
+
+      &:checked {
+        background: transparent;
+      }
+    }
+
+    .titre-button {
+      margin-left: 0.5rem;
+      padding: 0 0.2rem;
+      background: color.scale(black, $alpha: -40%);
+      border-radius: $radius-popup;
+    }
+
+    .titre-button:hover {
+      background: color.scale(black, $alpha: -40%, $lightness: 15%);
+    }
+
+    .titre-button:checked {
+      background: color.scale(black, $alpha: -40%, $lightness: 15%);
+    }
+
+    .external-button {
+      background: color.scale(black, $alpha: -40%);
+      border-radius: 50%;
+      padding: 0;
+      color: $bg-color;
+
+      &:hover {
+        background: color.scale(black, $alpha: -40%, $lightness: 15%);
+      }
+
+      &:checked {
+        background: color.scale(black, $alpha: -40%, $lightness: 15%);
+      }
+    }
+
+    .cover-pop {
+      box-shadow: 0px 0px 15px -5px #000000;
+      background-color: $mpris-bg-color;
+    }
+
+    .inside-cover {
+      padding: 0.7rem;
+    }
+
+    .titres {
+      border-radius: $radius-popup;
+      padding: 0.4rem;
+      background: color.scale(black, $alpha: -40%);
+    }
+
+    popover {
+
+      trough {
+        all: unset;
+        background: color.scale(black, $alpha: -40%);
+        min-height: 0.25rem;
+        border-radius: 0.5rem;
+        opacity: 1;
+
+        slider {
+          all: unset;
+        }
+
+        highlight {
+          all: unset;
+          border-radius: 0.5rem;
+          background: white;
+        }
+      }
+
+      button {
+        background: color.scale(black, $alpha: -40%);
+        padding: 0.4rem;
+
+        &:hover {
+          background: color.scale(black, $alpha: -40%, $lightness: 15%);
+        }
+      }
+    }
+  }
+
+  .workspaces {
+    color: $fg-color;
+    padding: 0;
+    .workspace {
+      min-width: 24px;
+      padding: 0;
+      border-radius: $radius-popup;
+      background: transparent;
+    }
+
+    .workspace.active {
+      background: $fg-color;
+      color: $bg-color;
+      font-weight: bold;
+    }
+
+    .workspace:hover {
+      background: color.scale(#F2F2F2, $lightness: -15%);
+    }
+
+    .workspace.active:hover {
+      background: color.scale(black, $lightness: 30%);
+    }
+  }
+
+  // ===== WEATHER =====
+  .weather {
+
+    popover contents,
+    button {
+      background: $weather-bg-color;
+      color: $weather-fg-color;
+    }
+
+    button {
+      &:hover {
+        background: color.scale($weather-bg-color, $lightness: -14%);
+      }
+
+      &:checked {
+        background: $weather-fg-color;
+        color: $bg-color;
+      }
+    }
+
+    popover contents {
+      background: $weather-bg-color;
+
+      &:hover {
+        background: $weather-bg-color;
+      }
+    }
+
+    popover {
+      button {
+        background: color.scale($weather-bg-color, $lightness: -5%);
+        padding: 0rem 0.5rem;
+
+        &:hover {
+          background: color.scale($weather-bg-color, $lightness: -14%);
+        }
+      }
+
+      switch {
+        &:checked {
+          background: $weather-fg-color;
+        }
+
+        slider {
+          background: $weather-bg-color;
+        }
+      }
+    }
+  }
+
+    // ===== UPDATES =====
+  .updates {
+
+    popover contents,
+    button {
+      background: $updates-bg-color;
+      color: $updates-fg-color;
+    }
+
+    button {
+      &:hover {
+        background: color.scale($updates-bg-color, $lightness: -14%);
+      }
+
+      &:checked {
+        background: $updates-fg-color;
+        color: $bg-color;
+      }
+    }
+
+    popover contents {
+      background: $updates-bg-color;
+
+      &:hover {
+        background: $updates-bg-color;
+      }
+    }
+
+    popover {
+      button {
+        background: color.scale($updates-bg-color, $lightness: -5%);
+        padding: 0rem 0.5rem;
+
+        &:hover {
+          background: color.scale($updates-bg-color, $lightness: -14%);
+        }
+      }
+
+      switch {
+        &:checked {
+          background: $updates-fg-color;
+        }
+
+        slider {
+          background: $updates-bg-color;
+        }
+      }
+    }
+  }
+    // ===== POWERMENU =====
+  .powermenu {
+
+    popover contents,
+    button {
+      background: $powermenu-bg-color;
+      color: $powermenu-fg-color;
+    }
+
+    button {
+      &:hover {
+        background: color.scale($powermenu-bg-color, $lightness: -14%);
+      }
+
+      &:checked {
+        background: $powermenu-fg-color;
+        color: $bg-color;
+      }
+    }
+
+    popover contents {
+      background: $powermenu-bg-color;
+
+      &:hover {
+        background: $powermenu-bg-color;
+      }
+    }
+
+    popover {
+      .logout {
+        padding: 1rem 1rem;
+      }
+      button {
+        background: color.scale($powermenu-bg-color, $lightness: -5%);
+        padding: 0rem 0.5rem;
+
+        &:hover {
+          background: color.scale($powermenu-bg-color, $lightness: -14%);
+        }
+      }
+
+      switch {
+        &:checked {
+          background: $powermenu-fg-color;
+        }
+
+        slider {
+          background: $powermenu-bg-color;
+        }
       }
     }
   }
 }
 
+// ============================================================================
+// WALLPAPER CAROUSEL
+// ============================================================================
+window#wallpaper-carousel {
+  background: transparent;
+  color: $wallpaper-carousel-fg-color;
+  font-family: $f-family;
+  font-size: $f-size;
+  font-weight: normal;
+
+  .carousel-main {
+    background: transparent;
+    padding: 2.5rem;
+
+  }
+
+
+  .carousel-row {
+    min-height: 400px;
+    padding: 1.25rem;
+  }
+
+  .wallpaper-card {
+    border-radius: $radius-popup;
+    padding: 0;
+    transition: all 300ms ease;
+    transform-origin: center;
+  }
+
+  .carousel-center {
+    transform: scale(1.2);
+    opacity: 1;
+    filter: brightness(1.1) contrast(1.1);
+    // CORRECTION : Utilisation directe de rgba() sans fonctions dépréciées
+    box-shadow: 0 8px 25px rgba(0, 170, 255, 0.4);
+    border: 4px solid $wallpaper-carousel-accent-color;
+  }
+
+  .carousel-adjacent {
+    transform: scale(1.0);
+    opacity: 0.8;
+    filter: brightness(0.9);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .carousel-outer {
+    transform: scale(0.8);
+    opacity: 0.6;
+    filter: brightness(0.7);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  }
+
+  .wallpaper-label-container {
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    padding: 0.5rem 0.625rem;
+    border-radius: 0 0 $radius-popup $radius-popup;
+  }
+
+  .wallpaper-label {
+    color: $wallpaper-carousel-fg-color;
+    font-weight: 500;
+    font-size: 0.9em;
+    font-family: $f-family;
+  }
+
+  .instructions {
+    opacity: 0.9;
+    font-size: 0.85em;
+    padding: 0.5rem;
+    color: color.scale($wallpaper-carousel-fg-color, $lightness: -20%);
+    font-family: $f-family;
+    background: $wallpaper-carousel-bg-color;
+    border-radius: $radius-bar;
+  }
+}
+
+// ============================================================================
+// AUTRES FENÊTRES
+// ============================================================================
+window#launcher {
+  background: transparent;
+  color: $applauncher-fg-color;
+  font-family: $f-family;
+  font-size: $f-size;
+  font-weight: normal;
+
+  box#launcher-content {
+    box-shadow: 0px 0px 20px -10px #000000;
+
+    background: $applauncher-bg-color;
+    min-width: 400px;
+    border-radius: $radius-bar;
+    padding: 0.5rem;
+
+    entry {
+      border-radius: $radius-bar + 0.5rem;
+
+      &:focus-within {
+        outline: none;
+      }
+    }
+
+    button {
+      margin-top: 0.5rem;
+      border-radius: $radius-bar + 0.5rem;
+      padding: 0.5rem;
+      background: color.scale($applauncher-bg-color, $lightness: -5%);
+
+      &:hover {
+        background: color.scale($applauncher-bg-color, $lightness: -14%);
+      }
+
+      &:focus {
+        background: color.scale($applauncher-bg-color, $lightness: -25%);
+        outline: none;
+      }
+
+      label {
+        margin-left: 0.5rem;
+        font-weight: normal;
+      }
+    }
+  }
+}
+
+window.NotificationPopups {
+  all: unset;
+}
+
+.Notification {
+  font-size: $f-size;
+  font-family: $f-family;
+  border-radius: $radius-popup;
+  background-color: $bg-color;
+  margin: 0.5rem 1rem 0.5rem 1rem;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
+
+  &.critical {
+    border: 1pt solid color.scale($error,$alpha: -60%);
+
+    .header {
+      .app-name {
+        color: color.scale($error,$alpha: -20%);
+      }
+
+      .app-icon {
+        color: color.scale($error,$alpha: -40%);
+      }
+    }
+  }
+
+  .header {
+    font-size: $f-size;
+    padding: 0.5rem;
+    color: $fg-color;
+
+    .app-icon {
+      margin: 0 0.4rem;
+    }
+
+    .app-name {
+      margin-right: 0.3rem;
+      font-weight: bold;
+
+      &:first-child {
+        margin-left: 0.4rem;
+      }
+    }
+
+    .time {
+      margin: 0 0.4rem;
+    }
+
+    button {
+      padding: 0.2rem;
+      min-width: 0;
+      min-height: 0;
+    }
+  }
+
+  separator {
+    margin: 0 0.4rem;
+    background-color: rgba(0,0,0,0.1);
+  }
+
+  .content {
+    font-size: $f-size;
+    margin: 1rem;
+    margin-top: 0.5rem;
+
+    .summary {
+      color: $fg-color;
+    }
+
+    .body {
+      font-size: $f-size;
+      opacity: 0.8;
+      color: $fg-color;
+    }
+
+    .image {
+      margin-right: 0.5rem;
+      border-radius: 9px;
+      min-width: 100px;
+      min-height: 100px;
+      background-size: cover;
+      background-position: center;
+    }
+  }
+
+  .actions {
+    margin: 1rem;
+    margin-top: 0;
+
+    button {
+      margin: 0 0.3rem;
+
+      &:first-child {
+        margin-left: 0;
+      }
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
 }

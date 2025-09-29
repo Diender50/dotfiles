@@ -78,11 +78,12 @@ layer-rule {
 }
 
 spawn-at-startup "~/.config/autostart/start-pipewire.sh"
-//spawn-at-startup "swaync"
-//spawn-sh-at-startup "waypaper --restore"
-//spawn-at-startup "waybar"
+spawn-at-startup "swww-daemon"
+spawn-at-startup "kione-shell"
 spawn-at-startup "/usr/libexec/polkit-mate-authentication-agent-1"
 spawn-at-startup "bash" "-c" "wl-paste --watch cliphist store &"
+spawn-at-startup "bash" "-c" "gsettings set org.gnome.desktop.interface gtk-theme Colloid-Light"
+spawn-at-startup "bash" "-c" "gsettings set org.gnome.desktop.interface icon-theme Colloid-Light"
 spawn-at-startup "nextcloud"
 spawn-at-startup "xwayland-satellite"
 
@@ -164,7 +165,9 @@ binds {
     Alt+Tab repeat=false { toggle-overview; }
 
     Mod+C repeat=false { close-window; }
-    Mod+R hotkey-overlay-title="Application Launcher" { spawn "rofi" "-show" "drun" "-show-icons";  }
+   // Mod+R hotkey-overlay-title="Application Launcher" { spawn "rofi" "-show" "drun" "-show-icons";  }
+    Mod+R hotkey-overlay-title="Application Launcher" { spawn "ags" "request" "applauncher";  }
+    Mod+E hotkey-overlay-title="Wallpaper carousel" { spawn "ags" "request" "wallpaper";  }
 
     Mod+WheelScrollDown      cooldown-ms=150 { focus-workspace-down; }
     Mod+WheelScrollUp        cooldown-ms=150 { focus-workspace-up; }

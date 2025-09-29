@@ -522,7 +522,7 @@ export class Player {
 }
 
 // -------------------------------------------------------
-// Mpris class: GARDE SEULEMENT UN PLAYER
+// Mpris class: VERSION SIMPLIFIÉE AVEC POLLING
 // -------------------------------------------------------
 export class MprisManager {
     private static _instance: MprisManager | null = null;
@@ -534,11 +534,67 @@ export class MprisManager {
         return MprisManager._instance;
     }
 
-    players = createState<Player[]>([]); // Contiendra au maximum 1 player
+    players = createState<Player[]>([]);
+    private availablePlayers = new Map<string, Player>();
+    private pauseTimeoutId: number | null = null;
+    private statusCheckTimer: AstalIO.Time | null = null;
+    private lastCurrentPlayerStatus: PlaybackStatus = PlaybackStatus.Stopped;
+    private readonly PAUSE_TIMEOUT = 5000; // 5 secondes
+    private readonly CHECK_INTERVAL = 1000; // Vérifier toutes les secondes
 
     constructor() {
         this._watchNameOwnerChanges();
         this._loadExistingPlayers();
+        this._startStatusMonitoring();
+    }
+
+    private _startStatusMonitoring(): void {
+        // Vérifier périodiquement les changements d'état
+        this.statusCheckTimer = interval(this.CHECK_INTERVAL, () => {
+            this._checkPlayerStatuses();
+        });
+    }
+
+    private _checkPlayerStatuses(): void {
+        const currentPlayers = this.players[0].get();
+        
+        if (currentPlayers.length === 0) return;
+        
+        const currentPlayer = currentPlayers[0];
+        const currentStatus = currentPlayer.playbackStatus[0].get();
+        
+        // Détecter changement d'état du player actuel
+        if (currentStatus !== this.lastCurrentPlayerStatus) {
+            console.log(`Current player status changed: ${this.lastCurrentPlayerStatus} -> ${currentStatus}`);
+            
+            if (currentStatus === PlaybackStatus.Paused || currentStatus === PlaybackStatus.Stopped) {
+                if (this.lastCurrentPlayerStatus === PlaybackStatus.Playing) {
+                    console.log("Current player paused, starting timeout...");
+                    this._startPauseTimeout();
+                }
+            } else if (currentStatus === PlaybackStatus.Playing) {
+                if (this.pauseTimeoutId !== null) {
+                    console.log("Current player resumed, canceling timeout");
+                    this._cancelPauseTimeout();
+                }
+            }
+            
+            this.lastCurrentPlayerStatus = currentStatus;
+        }
+        
+        // Si le player actuel est en pause/arrêté, vérifier les autres
+        if (currentStatus === PlaybackStatus.Paused || currentStatus === PlaybackStatus.Stopped) {
+            for (const [busName, player] of this.availablePlayers) {
+                if (busName === currentPlayer.busName) continue; // Skip le player actuel
+                
+                const otherStatus = player.playbackStatus[0].get();
+                if (otherStatus === PlaybackStatus.Playing) {
+                    console.log(`Found playing player while current is paused: ${busName}`);
+                    this._switchToPlayer(busName);
+                    return;
+                }
+            }
+        }
     }
 
     private _loadExistingPlayers(): void {
@@ -559,10 +615,10 @@ export class MprisManager {
                     let names: string[] = result.deep_unpack()[0]
                     for (let name of names) {
                         if (name.startsWith("org.mpris.MediaPlayer2")) {
-                            this._addPlayer(name);
-                            return; // ← Sortir après le premier player trouvé
+                            this._createPlayerInstance(name);
                         }
                     }
+                    this._selectBestPlayer();
                 } catch (e) {
                     console.error(e);
                 }
@@ -584,39 +640,162 @@ export class MprisManager {
                 if (!name.startsWith("org.mpris.MediaPlayer2")) return;
 
                 if (newOwner !== "") {
-                    // Seulement ajouter si on n'a pas encore de player
-                    if (this.players[0].get().length === 0) {
-                        this._addPlayer(name);
-                    }
+                    this._createPlayerInstance(name);
+                    this._selectBestPlayer();
                 } else {
-                    this._removePlayer(name);
+                    this._destroyPlayerInstance(name);
                 }
             }
         );
     }
 
-    private _addPlayer(busName: string): void {
-        const currentPlayers = this.players[0].get();
-        // N'ajouter que si la liste est vide
-        if (currentPlayers.length === 0) {
-            try {
-                let player = new Player(busName, true);
-                this.players[1]([player]); // Toujours un seul player
-            } catch (e) {
-                console.error("Failed to add player: " + busName, e)
-            }
+    private _createPlayerInstance(busName: string): void {
+        if (this.availablePlayers.has(busName)) return;
+
+        try {
+            const player = new Player(busName, false);
+            this.availablePlayers.set(busName, player);
+            console.log("Created player instance:", busName);
+        } catch (e) {
+            console.error("Failed to create player instance:", busName, e);
         }
     }
 
-    private _removePlayer(busName: string): void {
-        const currentPlayers = this.players[0].get();
-        const player = currentPlayers.find((player) => player.busName === busName);
+    private _startPauseTimeout(): void {
+        this._cancelPauseTimeout();
+        
+        console.log(`Starting pause timeout: ${this.PAUSE_TIMEOUT}ms`);
+        this.pauseTimeoutId = setTimeout(() => {
+            console.log("⏰ Pause timeout reached! Checking for active players...");
+            this._checkForActivePlayerAfterTimeout();
+            this.pauseTimeoutId = null;
+        }, this.PAUSE_TIMEOUT);
+    }
+
+    private _cancelPauseTimeout(): void {
+        if (this.pauseTimeoutId !== null) {
+            console.log("Canceling pause timeout");
+            clearTimeout(this.pauseTimeoutId);
+            this.pauseTimeoutId = null;
+        }
+    }
+
+    private _checkForActivePlayerAfterTimeout(): void {
+        console.log("🔍 Checking for active players after timeout...");
+        
+        // Lister tous les statuts actuels
+        for (const [busName, player] of this.availablePlayers) {
+            const status = player.playbackStatus[0].get();
+            console.log(`  ${busName}: ${status}`);
+        }
+        
+        // Chercher par priorité décroissante
+        const playersByPriority = Array.from(this.availablePlayers.entries())
+            .sort(([a], [b]) => this._getPlayerPriority(a) - this._getPlayerPriority(b));
+        
+        for (const [busName, player] of playersByPriority) {
+            const status = player.playbackStatus[0].get();
+            
+            if (status === PlaybackStatus.Playing) {
+                console.log(`🎵 Found active player: ${busName}, switching!`);
+                this._switchToPlayer(busName);
+                return;
+            }
+        }
+        
+        console.log("❌ No active players found, keeping current");
+    }
+
+    private _switchToPlayer(busName: string): void {
+        const player = this.availablePlayers.get(busName);
+        if (!player) {
+            console.log(`Player ${busName} not found in available players`);
+            return;
+        }
+
+        this._cancelPauseTimeout();
+        this.players[1]([player]);
+        this.lastCurrentPlayerStatus = player.playbackStatus[0].get();
+        console.log("✅ Switched to player:", busName);
+    }
+
+    private _destroyPlayerInstance(busName: string): void {
+        const player = this.availablePlayers.get(busName);
         if (player) {
             player.destroy();
-            this.players[1]([]); // Vider la liste
+            this.availablePlayers.delete(busName);
+            
+            const currentPlayers = this.players[0].get();
+            if (currentPlayers.length > 0 && currentPlayers[0].busName === busName) {
+                this.players[1]([]);
+                this._selectBestPlayer();
+            }
+            
+            console.log("Destroyed player instance:", busName);
+        }
+    }
+
+    private _getPlayerPriority(busName: string): number {
+        const priorities: Record<string, number> = {
+            'feishin': 1,
+            'supersonic': 2,
+            'floorp': 3,
+            'zen': 4,
+            'firefox': 5,
+        };
+
+        for (const [key, priority] of Object.entries(priorities)) {
+            if (busName.toLowerCase().includes(key)) {
+                return priority;
+            }
+        }
+        return 999;
+    }
+
+    private _selectBestPlayer(): void {
+        if (this.availablePlayers.size === 0) {
+            this.players[1]([]);
+            return;
+        }
+
+        // Chercher un player qui joue
+        const playingPlayers = Array.from(this.availablePlayers.entries())
+            .filter(([_, player]) => player.playbackStatus[0].get() === PlaybackStatus.Playing)
+            .sort(([a], [b]) => this._getPlayerPriority(a) - this._getPlayerPriority(b));
+
+        if (playingPlayers.length > 0) {
+            const [bestPlayingName, bestPlayingPlayer] = playingPlayers[0];
+            this.players[1]([bestPlayingPlayer]);
+            this.lastCurrentPlayerStatus = bestPlayingPlayer.playbackStatus[0].get();
+            console.log("Selected playing player:", bestPlayingName);
+            return;
+        }
+
+        // Sinon, prendre le meilleur par priorité
+        const sortedPlayers = Array.from(this.availablePlayers.entries())
+            .sort(([a], [b]) => this._getPlayerPriority(a) - this._getPlayerPriority(b));
+
+        if (sortedPlayers.length > 0) {
+            const [bestName, bestPlayer] = sortedPlayers[0];
+            this.players[1]([bestPlayer]);
+            this.lastCurrentPlayerStatus = bestPlayer.playbackStatus[0].get();
+            console.log("Selected best priority player:", bestName);
+        }
+    }
+
+    public destroy(): void {
+        this._cancelPauseTimeout();
+        if (this.statusCheckTimer) {
+            this.statusCheckTimer.cancel();
+        }
+        for (const player of this.availablePlayers.values()) {
+            player.destroy();
         }
     }
 }
+
+
+
 
 function formatTime(seconds: number): string {
     if (!seconds || seconds < 0) return "0:00"
