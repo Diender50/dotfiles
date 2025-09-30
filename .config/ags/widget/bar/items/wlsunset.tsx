@@ -3,7 +3,9 @@ import GLib from "gi://GLib"
 import { createState, onMount } from "ags"
 import { execAsync } from "ags/process"
 
+
 const CONFIG_FILE = `${GLib.get_home_dir()}/.config/ags/wlsunset.json`
+
 
 export function WlSunset() {
     const [isActive, setIsActive] = createState(false)
@@ -14,6 +16,7 @@ export function WlSunset() {
     const [longitude, setLongitude] = createState(7.4)
     const [locationLoading, setLocationLoading] = createState(false)
 
+
     // Valeurs par défaut
     const defaultConfig = {
         tempLow: 4000,
@@ -22,6 +25,7 @@ export function WlSunset() {
         latitude: 51.6,
         longitude: 7.4
     }
+
 
     // Charger les paramètres sauvegardés
     function loadConfig() {
@@ -40,6 +44,7 @@ export function WlSunset() {
             console.log("Aucune configuration wlsunset trouvée, utilisation des valeurs par défaut")
         }
     }
+
 
     // Sauvegarder les paramètres
     function saveConfig() {
@@ -61,6 +66,7 @@ export function WlSunset() {
         }
     }
 
+
     // Réinitialiser aux valeurs par défaut
     function resetToDefaults() {
         setTempLow(defaultConfig.tempLow)
@@ -72,6 +78,7 @@ export function WlSunset() {
         console.log("Paramètres réinitialisés aux valeurs par défaut")
     }
 
+
     // Vérifier le statut de wlsunset
     async function checkStatus() {
         try {
@@ -81,6 +88,7 @@ export function WlSunset() {
             setIsActive(false)
         }
     }
+
 
     // Toggle wlsunset
     async function toggleWlsunset() {
@@ -103,6 +111,7 @@ export function WlSunset() {
             // Ignorer les erreurs
         }
     }
+
 
     // Géolocalisation automatique
     async function detectLocation() {
@@ -128,6 +137,7 @@ export function WlSunset() {
         }
     }
 
+
     // Redémarrer wlsunset avec nouveaux paramètres
     async function restartWlsunset() {
         if (!isActive.get()) return
@@ -147,32 +157,9 @@ export function WlSunset() {
         }
     }
 
-    onMount(async () => {
-        loadConfig()
 
-        // Vérifier et démarrer wlsunset automatiquement
-        try {
-            await execAsync(["pgrep", "-x", "wlsunset"])
-            setIsActive(true)
-            console.log("wlsunset déjà actif")
-        } catch {
-            // wlsunset n'est pas actif, le démarrer automatiquement
-            try {
-                execAsync([
-                    "wlsunset",
-                    "-l", latitude.get().toString(),
-                    "-L", longitude.get().toString(),
-                    "-t", tempLow.get().toString(),
-                    "-T", tempHigh.get().toString(),
-                    "-d", duration.get().toString()
-                ]).catch(() => { })
-                setIsActive(true)
-                console.log("wlsunset démarré automatiquement")
-            } catch (e) {
-                console.error("Erreur démarrage auto wlsunset:", e)
-                setIsActive(false)
-            }
-        }
+    onMount(() => {
+        loadConfig()
     })
 
 
@@ -205,6 +192,7 @@ export function WlSunset() {
                         />
                     </box>
 
+
                     {/* Température jour */}
                     <box orientation={Gtk.Orientation.VERTICAL} spacing={3}>
                         <box orientation={Gtk.Orientation.HORIZONTAL} spacing={6}>
@@ -230,6 +218,7 @@ export function WlSunset() {
                             hexpand
                         />
                     </box>
+
 
                     {/* Température nuit */}
                     <box orientation={Gtk.Orientation.VERTICAL} spacing={3}>
@@ -257,6 +246,7 @@ export function WlSunset() {
                         />
                     </box>
 
+
                     {/* Durée de transition */}
                     <box orientation={Gtk.Orientation.VERTICAL} spacing={3}>
                         <box orientation={Gtk.Orientation.HORIZONTAL} spacing={6}>
@@ -282,6 +272,7 @@ export function WlSunset() {
                             hexpand
                         />
                     </box>
+
 
                     {/* Position */}
                     <box orientation={Gtk.Orientation.VERTICAL} spacing={4}>
@@ -326,6 +317,7 @@ export function WlSunset() {
                                 maxWidthChars={12}
                             />
                         </box>
+
 
                         {/* Buttons Appliquer et Réinitialiser */}
                         <box orientation={Gtk.Orientation.HORIZONTAL} spacing={6} homogeneous>

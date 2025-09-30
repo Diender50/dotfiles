@@ -941,7 +941,9 @@ window.NotificationPopups {
       }
     }
   }
-
+  .action-button {
+    color: $fg-color;
+  }
   .header {
     font-size: $f-size;
     padding: 0.5rem;
@@ -977,25 +979,27 @@ window.NotificationPopups {
   }
 
   .content {
+    padding: 0;
     font-size: $f-size;
-    margin: 1rem;
+    margin: 0.5rem;
     margin-top: 0.5rem;
 
     .summary {
+      padding: 0;
       color: $fg-color;
     }
 
     .body {
+      padding: 0;
       font-size: $f-size;
       opacity: 0.8;
       color: $fg-color;
     }
 
     .image {
-      margin-right: 0.5rem;
+      margin-right: 0.25rem;
       border-radius: 9px;
-      min-width: 100px;
-      min-height: 100px;
+
       background-size: cover;
       background-position: center;
     }

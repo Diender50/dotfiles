@@ -72,6 +72,7 @@ export default function Notification({ notification: n, onDismiss }: Notificatio
     <box
       class={`Notification ${getUrgencyClass(n)}`}
       orientation={Gtk.Orientation.VERTICAL}
+      heightRequest={100}
       widthRequest={350}
     >
       {/* Header */}
@@ -83,7 +84,7 @@ export default function Notification({ notification: n, onDismiss }: Notificatio
             pixelSize={16}
           />
         )}
-        
+
         {(n.desktopEntry && !n.appIcon && isIcon(n.desktopEntry)) && (
           <image
             class="app-icon"
@@ -91,25 +92,27 @@ export default function Notification({ notification: n, onDismiss }: Notificatio
             pixelSize={16}
           />
         )}
-        
+
         <label
           class="app-name"
           halign={Gtk.Align.START}
           ellipsize={Pango.EllipsizeMode.END}
           label={n.appName || "Unknown"}
+          maxWidthChars={20}
+          hexpand
         />
-        
+
         <label
           class="time"
-          hexpand
           halign={Gtk.Align.END}
           label={formatTime(n.time)}
         />
-        
+
         <button onClicked={handleDismiss} class="close-button">
           <image iconName="window-close-symbolic" pixelSize={12} />
         </button>
       </box>
+
 
       {/* Separator */}
       <Gtk.Separator visible />
@@ -118,14 +121,14 @@ export default function Notification({ notification: n, onDismiss }: Notificatio
       <box class="content" spacing={8}>
         {/* Image */}
         {n.image && fileExists(n.image) && (
-          <image 
+          <image
             valign={Gtk.Align.START}
-            class="image" 
+            class="image"
             file={n.image}
             pixelSize={64}
           />
         )}
-        
+
         {n.image && !fileExists(n.image) && isIcon(n.image) && (
           <box valign={Gtk.Align.START} class="icon-image">
             <image
@@ -138,25 +141,30 @@ export default function Notification({ notification: n, onDismiss }: Notificatio
         )}
 
         {/* Text content */}
-        <box orientation={Gtk.Orientation.VERTICAL} spacing={4} hexpand>
+        <box orientation={Gtk.Orientation.VERTICAL} spacing={4}>
           <label
             class="summary"
             halign={Gtk.Align.START}
             xalign={0}
             label={n.summary || ""}
-            ellipsize={Pango.EllipsizeMode.END}
             wrap
+            wrapMode={Pango.WrapMode.WORD_CHAR}
+            widthChars={40}
+            maxWidthChars={40}
+            justify={Gtk.Justification.LEFT}
           />
-          
+
           {n.body && (
             <label
               class="body"
               wrap
-              useMarkup
+              wrapMode={Pango.WrapMode.WORD_CHAR}
               halign={Gtk.Align.START}
               xalign={0}
-              justify={Gtk.Justification.FILL}
-              label={n.body}
+              justify={Gtk.Justification.LEFT}
+              label={n.body.replace(/<[^>]*>/g, '')} // Strip HTML tags
+              widthChars={40}
+              maxWidthChars={40}
             />
           )}
         </box>
@@ -166,15 +174,16 @@ export default function Notification({ notification: n, onDismiss }: Notificatio
       {n.actions.length > 0 && (
         <box class="actions" spacing={8}>
           {n.actions.map(({ label, id }) => (
-            <button 
-              hexpand 
+            <button
+              hexpand
               onClicked={() => handleAction(id)}
               class="action-button"
             >
-              <label 
-                label={label || ""} 
-                halign={Gtk.Align.CENTER} 
-                hexpand 
+              <label
+                label={label || ""}
+                halign={Gtk.Align.CENTER}
+                ellipsize={Pango.EllipsizeMode.MIDDLE}
+                maxWidthChars={15}
               />
             </button>
           ))}
