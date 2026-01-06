@@ -4,20 +4,18 @@ import AstalIO from "gi://AstalIO?version=0.1";
 import { interval } from "ags/time"
 import GLib from "gi://GLib?version=2.0";
 import Gtk from "gi://Gtk?version=4.0"
+import { glyphs } from "../../../src/lib/glyphs"
 
-// Define a PlaybackStatus enum for the player's playback status.
 export enum PlaybackStatus {
     Playing = "Playing",
     Paused = "Paused",
     Stopped = "Stopped"
 }
 
-// Cache des covers téléchargées avec nettoyage
 const coverCache = new Map<string, string>();
-const maxCacheSize = 20; // Maximum 20 covers en cache
+const maxCacheSize = 20;
 let cacheCleanupTimer: AstalIO.Time | null = null;
 
-// Fonction pour nettoyer le cache
 function cleanupCache() {
     const cacheDir = GLib.get_user_cache_dir() + "/ags-mpris-covers";
 
@@ -40,10 +38,8 @@ function cleanupCache() {
             files.push({ name, time: modTime });
         }
 
-        // Trier par date de modification (plus anciens en premier)
         files.sort((a, b) => a.time - b.time);
 
-        // Supprimer les fichiers les plus anciens si on dépasse la limite
         if (files.length > maxCacheSize) {
             const toDelete = files.slice(0, files.length - maxCacheSize);
             for (const file of toDelete) {
@@ -61,30 +57,24 @@ function cleanupCache() {
     }
 }
 
-// Démarrer le nettoyage automatique toutes les 5 minutes
 if (!cacheCleanupTimer) {
     cacheCleanupTimer = interval(300000, cleanupCache);
 }
 
-// Fonction pour télécharger une cover HTTP
 async function downloadCover(url: string): Promise<string | null> {
     if (coverCache.has(url)) {
         return coverCache.get(url)!;
     }
 
     try {
-        // Créer un nom de fichier unique pour le cache
         const urlHash = GLib.compute_checksum_for_string(GLib.ChecksumType.MD5, url, -1);
         const cacheDir = GLib.get_user_cache_dir() + "/ags-mpris-covers";
         const cachePath = `${cacheDir}/${urlHash}.jpg`;
 
-        // Créer le dossier cache s'il n'existe pas
         GLib.mkdir_with_parents(cacheDir, 0o755);
 
-        // Vérifier si le fichier existe déjà
         if (GLib.file_test(cachePath, GLib.FileTest.EXISTS)) {
             coverCache.set(url, cachePath);
-            // Mettre à jour la date de modification pour le cache LRU
             const file = Gio.File.new_for_path(cachePath);
             file.set_attribute_uint64(
                 "time::modified",
@@ -95,18 +85,15 @@ async function downloadCover(url: string): Promise<string | null> {
             return cachePath;
         }
 
-        // Nettoyer le cache avant d'ajouter
         if (coverCache.size >= maxCacheSize) {
             cleanupCache();
         }
 
-        // Télécharger l'image
         console.log("Downloading cover:", url);
 
         const file = Gio.File.new_for_uri(url);
         const outputFile = Gio.File.new_for_path(cachePath);
 
-        // Téléchargement asynchrone
         file.copy_async(
             outputFile,
             Gio.FileCopyFlags.OVERWRITE,
@@ -131,9 +118,6 @@ async function downloadCover(url: string): Promise<string | null> {
     }
 }
 
-// -------------------------------------------------------
-// Player class: represents a single MPRIS media player
-// -------------------------------------------------------
 export class Player {
     busName: string;
     rootProxy: Gio.DBusProxy | null;
@@ -155,7 +139,6 @@ export class Player {
     canControl = createState(false);
     canSeek = createState(false);
 
-    // Pour l'estimation purement locale
     private basePosition: number = 0;
     private startTime: number = 0;
     private isLocallyPlaying: boolean = false;
@@ -185,7 +168,6 @@ export class Player {
     }
 
     private _startLocalEstimation() {
-        // Timer purement local - AUCUN appel D-Bus
         this.estimationTimer = interval(200, () => {
             if (this.isLocallyPlaying) {
                 const now = Date.now();
@@ -196,7 +178,6 @@ export class Player {
                 if (maxPos > 0 && currentPos <= maxPos) {
                     this.position[1](currentPos);
                 } else if (maxPos > 0) {
-                    // Fin de piste atteinte
                     this.position[1](maxPos);
                     this.isLocallyPlaying = false;
                 }
@@ -214,19 +195,16 @@ export class Player {
     private async _processCoverArt(artUrl: string) {
         this.coverArt[1](artUrl);
 
-        // Nettoyer l'ancienne cover si elle change
         const oldCover = this.localCoverPath[0].get();
         if (oldCover && oldCover !== artUrl) {
             this.localCoverPath[1]("");
         }
 
         if (artUrl && (artUrl.startsWith('http://') || artUrl.startsWith('https://'))) {
-            // Pour les URLs HTTP, essayer de télécharger
             const localPath = await downloadCover(artUrl);
             if (localPath) {
                 this.localCoverPath[1](localPath);
             } else {
-                // Programmer une nouvelle tentative après 2 secondes
                 setTimeout(async () => {
                     const retryPath = coverCache.get(artUrl);
                     if (retryPath && GLib.file_test(retryPath, GLib.FileTest.EXISTS)) {
@@ -235,7 +213,6 @@ export class Player {
                 }, 2000);
             }
         } else if (artUrl) {
-            // Fichier local
             if (artUrl.startsWith('file://')) {
                 artUrl = artUrl.substring(7);
             }
@@ -521,9 +498,6 @@ export class Player {
     }
 }
 
-// -------------------------------------------------------
-// Mpris class: VERSION SIMPLIFIÉE AVEC POLLING
-// -------------------------------------------------------
 export class MprisManager {
     private static _instance: MprisManager | null = null;
 
@@ -536,11 +510,11 @@ export class MprisManager {
 
     players = createState<Player[]>([]);
     private availablePlayers = new Map<string, Player>();
-    private pauseTimeoutId: number | null = null;
+    private pauseTimeoutId: AstalIO.Time | null = null;
     private statusCheckTimer: AstalIO.Time | null = null;
     private lastCurrentPlayerStatus: PlaybackStatus = PlaybackStatus.Stopped;
-    private readonly PAUSE_TIMEOUT = 5000; // 5 secondes
-    private readonly CHECK_INTERVAL = 1000; // Vérifier toutes les secondes
+    private readonly PAUSE_TIMEOUT = 5000;
+    private readonly CHECK_INTERVAL = 1000;
 
     constructor() {
         this._watchNameOwnerChanges();
@@ -549,7 +523,6 @@ export class MprisManager {
     }
 
     private _startStatusMonitoring(): void {
-        // Vérifier périodiquement les changements d'état
         this.statusCheckTimer = interval(this.CHECK_INTERVAL, () => {
             this._checkPlayerStatuses();
         });
@@ -557,16 +530,15 @@ export class MprisManager {
 
     private _checkPlayerStatuses(): void {
         const currentPlayers = this.players[0].get();
-        
+
         if (currentPlayers.length === 0) return;
-        
+
         const currentPlayer = currentPlayers[0];
         const currentStatus = currentPlayer.playbackStatus[0].get();
-        
-        // Détecter changement d'état du player actuel
+
         if (currentStatus !== this.lastCurrentPlayerStatus) {
             console.log(`Current player status changed: ${this.lastCurrentPlayerStatus} -> ${currentStatus}`);
-            
+
             if (currentStatus === PlaybackStatus.Paused || currentStatus === PlaybackStatus.Stopped) {
                 if (this.lastCurrentPlayerStatus === PlaybackStatus.Playing) {
                     console.log("Current player paused, starting timeout...");
@@ -578,15 +550,14 @@ export class MprisManager {
                     this._cancelPauseTimeout();
                 }
             }
-            
+
             this.lastCurrentPlayerStatus = currentStatus;
         }
-        
-        // Si le player actuel est en pause/arrêté, vérifier les autres
+
         if (currentStatus === PlaybackStatus.Paused || currentStatus === PlaybackStatus.Stopped) {
             for (const [busName, player] of this.availablePlayers) {
-                if (busName === currentPlayer.busName) continue; // Skip le player actuel
-                
+                if (busName === currentPlayer.busName) continue;
+
                 const otherStatus = player.playbackStatus[0].get();
                 if (otherStatus === PlaybackStatus.Playing) {
                     console.log(`Found playing player while current is paused: ${busName}`);
@@ -663,46 +634,47 @@ export class MprisManager {
 
     private _startPauseTimeout(): void {
         this._cancelPauseTimeout();
-        
+
         console.log(`Starting pause timeout: ${this.PAUSE_TIMEOUT}ms`);
-        this.pauseTimeoutId = setTimeout(() => {
+        this.pauseTimeoutId = interval(this.PAUSE_TIMEOUT, () => {
             console.log("⏰ Pause timeout reached! Checking for active players...");
             this._checkForActivePlayerAfterTimeout();
-            this.pauseTimeoutId = null;
-        }, this.PAUSE_TIMEOUT);
+            if (this.pauseTimeoutId) {
+                this.pauseTimeoutId.cancel();
+                this.pauseTimeoutId = null;
+            }
+        });
     }
 
     private _cancelPauseTimeout(): void {
         if (this.pauseTimeoutId !== null) {
             console.log("Canceling pause timeout");
-            clearTimeout(this.pauseTimeoutId);
+            this.pauseTimeoutId.cancel();
             this.pauseTimeoutId = null;
         }
     }
 
     private _checkForActivePlayerAfterTimeout(): void {
         console.log("🔍 Checking for active players after timeout...");
-        
-        // Lister tous les statuts actuels
+
         for (const [busName, player] of this.availablePlayers) {
             const status = player.playbackStatus[0].get();
             console.log(`  ${busName}: ${status}`);
         }
-        
-        // Chercher par priorité décroissante
+
         const playersByPriority = Array.from(this.availablePlayers.entries())
             .sort(([a], [b]) => this._getPlayerPriority(a) - this._getPlayerPriority(b));
-        
+
         for (const [busName, player] of playersByPriority) {
             const status = player.playbackStatus[0].get();
-            
+
             if (status === PlaybackStatus.Playing) {
                 console.log(`🎵 Found active player: ${busName}, switching!`);
                 this._switchToPlayer(busName);
                 return;
             }
         }
-        
+
         console.log("❌ No active players found, keeping current");
     }
 
@@ -724,13 +696,13 @@ export class MprisManager {
         if (player) {
             player.destroy();
             this.availablePlayers.delete(busName);
-            
+
             const currentPlayers = this.players[0].get();
             if (currentPlayers.length > 0 && currentPlayers[0].busName === busName) {
                 this.players[1]([]);
                 this._selectBestPlayer();
             }
-            
+
             console.log("Destroyed player instance:", busName);
         }
     }
@@ -758,7 +730,6 @@ export class MprisManager {
             return;
         }
 
-        // Chercher un player qui joue
         const playingPlayers = Array.from(this.availablePlayers.entries())
             .filter(([_, player]) => player.playbackStatus[0].get() === PlaybackStatus.Playing)
             .sort(([a], [b]) => this._getPlayerPriority(a) - this._getPlayerPriority(b));
@@ -771,7 +742,6 @@ export class MprisManager {
             return;
         }
 
-        // Sinon, prendre le meilleur par priorité
         const sortedPlayers = Array.from(this.availablePlayers.entries())
             .sort(([a], [b]) => this._getPlayerPriority(a) - this._getPlayerPriority(b));
 
@@ -794,9 +764,6 @@ export class MprisManager {
     }
 }
 
-
-
-
 function formatTime(seconds: number): string {
     if (!seconds || seconds < 0) return "0:00"
     const mins = Math.floor(seconds / 60)
@@ -810,19 +777,48 @@ export function Mpris() {
     return (
         <For each={mpris.players[0]}>
             {(player: Player) => (
-                <box
-                    css={player.localCoverPath[0]((path) =>
-                        path ?
-                            `background-image: url('file://${path}');background-size: cover;background-position: center;` :
-                            ''
-                    )}
-                    class="mpris"
-                    spacing={4}
-                >
+                <box class="mpris" spacing={4}>
+                                        <box
+                        class="mpris-external-controls"
+                        orientation={Gtk.Orientation.HORIZONTAL}
+                        spacing={2}
+                        halign={Gtk.Align.END}
+                    >
+                        <button
+                            onClicked={() => player.previousTrack()}
+                            visible={player.canGoPrevious[0]((can) => can)}
+                            class="mpris-external-btn"
+                        >
+                            <label label={glyphs.mpris.previous} class="mpris-external-icon" />
+                        </button>
+
+                        <button
+                            onClicked={() => player.playPause()}
+                            visible={player.canControl[0]((can) => can)}
+                            class="mpris-external-btn mpris-external-play"
+                        >
+                            <label
+                                label={player.playbackStatus[0]((status) =>
+                                    status === PlaybackStatus.Playing
+                                        ? glyphs.mpris.pause
+                                        : glyphs.mpris.play
+                                )}
+                                class="mpris-external-icon"
+                            />
+                        </button>
+
+                        <button
+                            onClicked={() => player.nextTrack()}
+                            visible={player.canGoNext[0]((can) => can)}
+                            class="mpris-external-btn"
+                        >
+                            <label label={glyphs.mpris.next} class="mpris-external-icon" />
+                        </button>
+                    </box>
                     <menubutton>
                         <label
                             label={player.displayText[0]((text) => text)}
-                            class="titre-button"
+                            class="mpris-title-label"
                             maxWidthChars={32}
                             ellipsize={3}
                             wrap={false}
@@ -831,166 +827,146 @@ export function Mpris() {
                             valign={Gtk.Align.CENTER}
                         />
 
-                        {/* Popover détaillé */}
-                        <popover widthRequest={250} heightRequest={250}>
+                        <popover>
                             <box
-                                widthRequest={250} heightRequest={250}
-                                spacing={8}
-                                orientation={Gtk.Orientation.VERTICAL}
-                                css={player.localCoverPath[0]((path) =>
-                                    path ?
-                                        `background-image: url('file://${path}'); background-size: cover; background-position: center;` :
-                                        ''
-                                )}
-                                class="cover-pop"
+                                class="mpris-popover"
+                                orientation={Gtk.Orientation.HORIZONTAL}
+                                spacing={6}
                             >
-                                <box class="inside-cover" orientation={Gtk.Orientation.VERTICAL}>
-                                    {/* Titre en haut */}
+                                <box
+                                    class="mpris-cover"
+                                    widthRequest={120}
+                                    heightRequest={120}
+                                    css={player.localCoverPath[0]((path) =>
+                                        path ? `background-image: url('file://${path}'); background-size: cover; background-position: center;` : ''
+                                    )}
+                                />
+
+                                <box
+                                    class="mpris-content"
+                                    orientation={Gtk.Orientation.VERTICAL}
+                                    spacing={8}
+                                    vexpand
+                                >
                                     <box
-                                        valign={Gtk.Align.START}
-                                        halign={Gtk.Align.CENTER}
+                                        class="mpris-info"
                                         orientation={Gtk.Orientation.VERTICAL}
-                                        class="titres"
+                                        spacing={2}
+                                        halign={Gtk.Align.START}
                                     >
                                         <label
                                             label={player.title[0]((title) => title)}
-                                            maxWidthChars={30}
+                                            class="mpris-info-title"
+                                            maxWidthChars={26}
                                             ellipsize={3}
                                             wrap={false}
-                                            css="font-weight: bold;"
+                                            halign={Gtk.Align.START}
                                         />
                                         <label
                                             label={player.artist[0]((artist) => artist)}
-                                            maxWidthChars={30}
+                                            class="mpris-info-artist"
+                                            maxWidthChars={26}
                                             ellipsize={3}
                                             wrap={false}
-                                        />
-                                        <label
-                                            label={player.album[0]((album) => album)}
-                                            maxWidthChars={30}
-                                            ellipsize={3}
-                                            wrap={false}
-                                            css="font-size: 0.9em;"
+                                            halign={Gtk.Align.START}
                                         />
                                     </box>
 
-                                    {/* Espace vide qui pousse les contrôles vers le bas */}
-                                    <box vexpand />
-
-                                    {/* Contrôles collés en bas */}
                                     <box
-                                        valign={Gtk.Align.END}
+                                        class="mpris-progress"
                                         orientation={Gtk.Orientation.VERTICAL}
-                                        spacing={8}
+                                        spacing={2}
+                                        vexpand
+                                        valign={Gtk.Align.END}
                                     >
-                                        {/* Barre de progression */}
-                                        <box orientation={Gtk.Orientation.VERTICAL}>
-                                            <box>
-                                                <label
-                                                    label={player.position[0]((pos) => formatTime(pos))}
-                                                    class="time"
-                                                />
-                                                <box hexpand />
-                                                <label
-                                                    label={player.trackLength[0]((len) => formatTime(len))}
-                                                    class="time"
-                                                />
-                                            </box>
-                                            <slider
+                                        <slider
+                                            value={player.position[0]((pos) => pos)}
+                                            min={0}
+                                            max={player.trackLength[0]((len) => Math.max(len, 1))}
+                                            drawValue={false}
+                                            class="mpris-progress-slider"
+                                            hexpand
+                                        />
+                                        <box
+                                            class="mpris-progress-times"
+                                            orientation={Gtk.Orientation.HORIZONTAL}
+                                            spacing={0}
+                                        >
+                                            <label
+                                                label={player.position[0]((pos) => formatTime(pos))}
+                                                class="mpris-progress-time"
+                                                halign={Gtk.Align.START}
                                                 hexpand
-                                                value={player.position[0]((pos) => pos)}
-                                                min={0}
-                                                max={player.trackLength[0]((len) => Math.max(len, 1))}
-                                                drawValue={false}
                                             />
-
-                                            {/* Temps */}
-                              
+                                            <label
+                                                label={player.trackLength[0]((len) => {
+                                                    const remaining = len - player.position[0].get();
+                                                    return `-${formatTime(remaining)}`;
+                                                })}
+                                                class="mpris-progress-time"
+                                                halign={Gtk.Align.END}
+                                            />
                                         </box>
+                                    </box>
 
-                                        {/* Boutons de contrôle */}
-                                        <box halign={Gtk.Align.CENTER} spacing={8}>
-                                            <button
-                                                onClicked={() => player.previousTrack()}
-                                                visible={player.canGoPrevious[0]((can) => can)}
-                                            >
-                                                <image iconName="media-skip-backward-symbolic" pixelSize={16} />
-                                            </button>
+                                    <box
+                                        class="mpris-controls"
+                                        orientation={Gtk.Orientation.HORIZONTAL}
+                                        spacing={4}
+                                        halign={Gtk.Align.CENTER}
+                                    >
+                                        <button
+                                            onClicked={() => player.previousTrack()}
+                                            visible={player.canGoPrevious[0]((can) => can)}
+                                            class="mpris-control-btn"
+                                        >
+                                            <label label={glyphs.mpris.previous} />
+                                        </button>
 
-                                            <button
-                                                onClicked={() => player.seek(-10)}
-                                                visible={player.canSeek[0]((can) => can)}
-                                            >
-                                                <image iconName="media-seek-backward-symbolic" pixelSize={16} />
-                                            </button>
+                                        <button
+                                            onClicked={() => player.seek(-10)}
+                                            visible={player.canSeek[0]((can) => can)}
+                                            class="mpris-control-btn mpris-control-seek"
+                                        >
+                                            <label label={glyphs.mpris.seekBackward} />
+                                        </button>
 
-                                            <button
-                                                onClicked={() => player.playPause()}
-                                                visible={player.canControl[0]((can) => can)}
-                                            >
-                                                <image
-                                                    iconName={player.playbackStatus[0]((status) =>
-                                                        status === PlaybackStatus.Playing
-                                                            ? "media-playback-pause-symbolic"
-                                                            : "media-playback-start-symbolic"
-                                                    )}
-                                                    pixelSize={16}
-                                                />
-                                            </button>
+                                        <button
+                                            onClicked={() => player.playPause()}
+                                            visible={player.canControl[0]((can) => can)}
+                                            class="mpris-control-btn mpris-control-play"
+                                        >
+                                            <label
+                                                label={player.playbackStatus[0]((status) =>
+                                                    status === PlaybackStatus.Playing
+                                                        ? glyphs.mpris.pause
+                                                        : glyphs.mpris.play
+                                                )}
+                                            />
+                                        </button>
 
-                                            <button
-                                                onClicked={() => player.seek(10)}
-                                                visible={player.canSeek[0]((can) => can)}
-                                            >
-                                                <image iconName="media-seek-forward-symbolic" pixelSize={16} />
-                                            </button>
+                                        <button
+                                            onClicked={() => player.seek(10)}
+                                            visible={player.canSeek[0]((can) => can)}
+                                            class="mpris-control-btn mpris-control-seek"
+                                        >
+                                            <label label={glyphs.mpris.seekForward} />
+                                        </button>
 
-                                            <button
-                                                onClicked={() => player.nextTrack()}
-                                                visible={player.canGoNext[0]((can) => can)}
-                                            >
-                                                <image iconName="media-skip-forward-symbolic" pixelSize={16} />
-                                            </button>
-                                        </box>
+                                        <button
+                                            onClicked={() => player.nextTrack()}
+                                            visible={player.canGoNext[0]((can) => can)}
+                                            class="mpris-control-btn"
+                                        >
+                                            <label label={glyphs.mpris.next} />
+                                        </button>
                                     </box>
                                 </box>
                             </box>
                         </popover>
+
                     </menubutton>
 
-                    {/* Buttons EXTERNES au menubutton */}
-                    <box halign={Gtk.Align.END} spacing={2}>
-                        <button
-                            onClicked={() => player.previousTrack()}
-                            visible={player.canGoPrevious[0]((can) => can)}
-                            class="external-button"
-                        >
-                            <image iconName="media-skip-backward-symbolic" pixelSize={8} />
-                        </button>
-
-                        <button
-                            onClicked={() => player.playPause()}
-                            visible={player.canControl[0]((can) => can)}
-                            class="external-button mpris-play"
-                        >
-                            <image
-                                iconName={player.playbackStatus[0]((status) =>
-                                    status === PlaybackStatus.Playing
-                                        ? "media-playback-pause-symbolic"
-                                        : "media-playback-start-symbolic"
-                                )}
-                                pixelSize={8}
-                            />
-                        </button>
-
-                        <button
-                            onClicked={() => player.nextTrack()}
-                            visible={player.canGoNext[0]((can) => can)}
-                            class="external-button"
-                        >
-                            <image iconName="media-skip-forward-symbolic" pixelSize={8} />
-                        </button>
-                    </box>
                 </box>
             )}
         </For>

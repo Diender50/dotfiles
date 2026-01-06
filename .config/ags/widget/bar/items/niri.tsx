@@ -27,7 +27,7 @@ function Workspaces({ output }: { output: AstalNiri.Output }) {
    );
 
    return (
-      <box spacing={4} class={"workspaces"}>
+      <box spacing={0} class={"workspaces"}>
          <For each={workspaces}>
             {(ws) => <WorkspaceButton ws={ws} />}
          </For>

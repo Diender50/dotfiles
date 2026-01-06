@@ -19,23 +19,23 @@ output "eDP-1" {
     mode "3072x1920@60.138"
     scale 2
     transform "normal"
-    position x=3840 y=0
+    position x=0 y=0
 }
 output "HDMI-A-1" {
     mode "1920x1080@180.003006"
     scale 1
     transform "normal"
-    position x=1920 y=0
+    position x=1536 y=0
 }
 output "DP-5" {
     mode "1920x1080@100.00"
     scale 1
     transform "normal"
-    position x=0 y=0
+    position x=3456 y=0
 }
 
 layout {
-    gaps 16
+    gaps 8
     center-focused-column "on-overflow"
     always-center-single-column
     preset-column-widths {
@@ -145,19 +145,20 @@ layer-rule {
 
 window-rule {
     match app-id="kitty"
+    match app-id="ghostty"
     open-floating true
     default-column-width { fixed 580; }
     default-window-height { fixed 370; }
 }
 
 window-rule {
-    geometry-corner-radius 8
+    geometry-corner-radius 0
     clip-to-geometry true
 }
 
 binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
-    Mod+T hotkey-overlay-title="Open a Terminal: kitty" { spawn "kitty"; }
+    Mod+T hotkey-overlay-title="Open a Terminal: kitty" { spawn "ghostty"; }
 
     Super+Shift+S { spawn-sh "grim -g  \"$(slurp -o -r -c '#ff0000ff')\" -t ppm - | satty --filename - --fullscreen --output-filename ~/Pictures/Screenshots/satty-$(date '+%Y%m%d-%H:%M:%S').png";} 
     Super+Shift+X { spawn-sh "~/.scripts/wgifcap";} 
@@ -191,10 +192,13 @@ binds {
 
     Mod+Ctrl+C { center-visible-columns; }
 
-    XF86AudioRaiseVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+"; }
+    XF86AudioRaiseVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+" "-l" "1"; }
     XF86AudioLowerVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-"; }
+    XF86AudioMute { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+
     XF86MonBrightnessUp  { spawn "brightnessctl" "-q" "set" "2%+"; }
     XF86MonBrightnessDown  { spawn "brightnessctl" "-q" "set" "2%-"; }
+    
     XF86AudioPlay { spawn "playerctl" "play-pause"; }
     XF86AudioNext { spawn "playerctl" "next"; }
     XF86AudioPrev { spawn "playerctl" "previous"; }

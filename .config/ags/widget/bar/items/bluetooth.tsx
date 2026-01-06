@@ -1,19 +1,36 @@
 import AstalBluetooth from "gi://AstalBluetooth"
-import { Astal, Gdk, Gtk } from "ags/gtk4"
-import { For, With, createBinding, createState, onMount } from "ags"
+import { Gtk } from "ags/gtk4"
+import { For, createState, onMount } from "ags"
 import { execAsync } from "ags/process"
+import { getBluetoothGlyph, getBluetoothDeviceGlyph } from "../../../src/lib/glyphs"
+
+
+
+interface BluetoothDevice {
+    address: string;
+    name: string;
+    connected: boolean;
+    paired: boolean;
+    icon: string;
+}
+
+
 
 export function Bluetooth() {
     const bluetooth = AstalBluetooth.get_default()
 
-    const [revealedMap, setRevealedMap] = createState(new Map())
+
+
+    const [revealedMap, setRevealedMap] = createState(new Map<string, boolean>())
     const [bluetoothEnabled, setBluetoothEnabled] = createState(false)
     const [isScanning, setIsScanning] = createState(false)
-    const [allDevices, setAllDevices] = createState([])
+    const [allDevices, setAllDevices] = createState<BluetoothDevice[]>([])
     const [isChangingState, setIsChangingState] = createState(false)
 
+
+
     // Vérifier l'état bluetooth
-    async function checkPowerState() {
+    async function checkPowerState(): Promise<boolean> {
         try {
             const result = await execAsync(["bluetoothctl", "show"])
             const powered = result.includes("Powered: yes")
@@ -26,8 +43,10 @@ export function Bluetooth() {
         }
     }
 
+
+
     // Vérifier si un device est connecté
-    async function checkDeviceConnection(mac) {
+    async function checkDeviceConnection(mac: string): Promise<boolean> {
         try {
             const result = await execAsync(["bluetoothctl", "info", mac])
             return result.includes("Connected: yes")
@@ -36,8 +55,10 @@ export function Bluetooth() {
         }
     }
 
+
+
     // Vérifier si un device est appairé
-    async function checkDevicePaired(mac) {
+    async function checkDevicePaired(mac: string): Promise<boolean> {
         try {
             const result = await execAsync(["bluetoothctl", "info", mac])
             return result.includes("Paired: yes")
@@ -46,11 +67,15 @@ export function Bluetooth() {
         }
     }
 
+
+
     // Récupérer tous les devices
-    async function getDevices() {
+    async function getDevices(): Promise<BluetoothDevice[]> {
         try {
             const result = await execAsync(["bluetoothctl", "devices"])
-            const devices = []
+            const devices: BluetoothDevice[] = []
+
+
 
             for (const line of result.split('\n')) {
                 const match = line.match(/Device ([A-F0-9:]+) (.+)/)
@@ -58,20 +83,28 @@ export function Bluetooth() {
                     const mac = match[1]
                     const name = match[2].trim()
 
+
+
                     const connected = await checkDeviceConnection(mac)
                     const paired = await checkDevicePaired(mac)
 
+
+
                     console.log(`Device ${name}: paired=${paired}, connected=${connected}`)
+
+
 
                     devices.push({
                         address: mac,
                         name: name,
                         connected: connected,
                         paired: paired,
-                        icon: getDeviceIconByName(name)
+                        icon: getBluetoothDeviceGlyph(name)
                     })
                 }
             }
+
+
 
             console.log("Devices trouvés:", devices.length)
             return devices
@@ -81,15 +114,21 @@ export function Bluetooth() {
         }
     }
 
+
+
     // Scanner les devices
-    async function scanDevices() {
+    async function scanDevices(): Promise<void> {
         if (isScanning.get()) {
             console.log("Scan déjà en cours")
             return
         }
 
+
+
         console.log("Début scan 10s")
         setIsScanning(true)
+
+
 
         try {
             await execAsync(["bluetoothctl", "--timeout", "10", "scan", "on"])
@@ -97,32 +136,44 @@ export function Bluetooth() {
             setIsScanning(false)
             console.log("Scan terminé")
         } catch (e) {
-            console.log("Scan terminé:", e.message)
+            console.log("Scan terminé:", (e as Error).message)
             setIsScanning(false)
             await refreshDeviceList()
         }
     }
 
-    async function refreshDeviceList() {
+
+
+    async function refreshDeviceList(): Promise<void> {
         console.log("Rafraîchissement liste devices")
         const devices = await getDevices()
         setAllDevices(devices)
     }
 
+
+
     // Toggle power
-    async function handleTogglePower() {
+    async function handleTogglePower(): Promise<void> {
         console.log("SWITCH TOGGLED - fonction appelée")
+
+
 
         if (isChangingState.get()) {
             console.log("Changement d'état en cours, ignoré")
             return
         }
 
+
+
         setIsChangingState(true)
+
+
 
         try {
             const currentState = bluetoothEnabled.get()
             console.log("Toggle bluetooth, état actuel:", currentState)
+
+
 
             if (currentState) {
                 console.log("Tentative désactivation...")
@@ -131,6 +182,8 @@ export function Bluetooth() {
             } else {
                 console.log("Tentative activation...")
 
+
+
                 try {
                     await execAsync(["rfkill", "unblock", "bluetooth"])
                     await new Promise(resolve => setTimeout(resolve, 1000))
@@ -138,18 +191,26 @@ export function Bluetooth() {
                     console.log("rfkill non disponible ou déjà débloqué")
                 }
 
+
+
                 await execAsync(["bluetoothctl", "power", "on"])
                 console.log("Bluetooth activé")
+
+
 
                 setTimeout(async () => {
                     await refreshDeviceList()
                 }, 2000)
             }
 
+
+
             setTimeout(async () => {
                 await checkPowerState()
                 setIsChangingState(false)
             }, 1000)
+
+
 
         } catch (e) {
             console.error("ERREUR toggle power:", e)
@@ -160,24 +221,7 @@ export function Bluetooth() {
         }
     }
 
-    function getDeviceIconByName(name) {
-        const nameLower = name.toLowerCase()
-        if (nameLower.includes("headphone") || nameLower.includes("headset") ||
-            nameLower.includes("buds") || nameLower.includes("airpods")) {
-            return "audio-headphones-symbolic"
-        } else if (nameLower.includes("mouse")) {
-            return "input-mouse-symbolic"
-        } else if (nameLower.includes("keyboard")) {
-            return "input-keyboard-symbolic"
-        } else if (nameLower.includes("phone") || nameLower.includes("galaxy") ||
-            nameLower.includes("iphone") || nameLower.includes("pixel")) {
-            return "phone-symbolic"
-        } else if (nameLower.includes("speaker")) {
-            return "audio-speakers-symbolic"
-        } else {
-            return "bluetooth-symbolic"
-        }
-    }
+
 
     onMount(async () => {
         console.log("Initialisation Bluetooth")
@@ -187,7 +231,9 @@ export function Bluetooth() {
         }
     })
 
-    function toggleRevealer(deviceId) {
+
+
+    function toggleRevealer(deviceId: string): void {
         setRevealedMap(prev => {
             const map = new Map(prev)
             map.set(deviceId, !map.get(deviceId))
@@ -195,10 +241,14 @@ export function Bluetooth() {
         })
     }
 
-    async function connectDevice(device) {
+
+
+    async function connectDevice(device: BluetoothDevice): Promise<void> {
         try {
             console.log("Connexion à", device.name)
             await execAsync(["bluetoothctl", "connect", device.address])
+
+
 
             setTimeout(async () => {
                 await refreshDeviceList()
@@ -213,10 +263,14 @@ export function Bluetooth() {
         }
     }
 
-    async function disconnectDevice(device) {
+
+
+    async function disconnectDevice(device: BluetoothDevice): Promise<void> {
         try {
             console.log("Déconnexion de", device.name)
             await execAsync(["bluetoothctl", "disconnect", device.address])
+
+
 
             setTimeout(async () => {
                 await refreshDeviceList()
@@ -226,25 +280,35 @@ export function Bluetooth() {
         }
     }
 
+
+
     // Appairage + Connexion automatique
-    async function pairDevice(device) {
+    async function pairDevice(device: BluetoothDevice): Promise<void> {
         try {
             console.log("Appairage avec", device.name)
+
+
 
             // Étape 1: Appairage
             await execAsync(["bluetoothctl", "pair", device.address])
             console.log("Appairage réussi pour", device.name)
+
+
 
             // Étape 2: Trust
             try {
                 await execAsync(["bluetoothctl", "trust", device.address])
                 console.log("Device trusted:", device.name)
             } catch (e) {
-                console.log("Impossible de trust le device:", e.message)
+                console.log("Impossible de trust le device:", (e as Error).message)
             }
+
+
 
             // Attendre un peu pour que l'appairage soit bien établi
             await new Promise(resolve => setTimeout(resolve, 1000))
+
+
 
             // Étape 3: Connexion automatique
             try {
@@ -252,9 +316,11 @@ export function Bluetooth() {
                 await execAsync(["bluetoothctl", "connect", device.address])
                 console.log("Connexion automatique réussie pour", device.name)
             } catch (e) {
-                console.log("Erreur connexion automatique:", e.message)
+                console.log("Erreur connexion automatique:", (e as Error).message)
                 // Même si la connexion échoue, on continue
             }
+
+
 
             // Fermer le revealer et rafraîchir
             setRevealedMap(prev => {
@@ -263,27 +329,37 @@ export function Bluetooth() {
                 return map
             })
 
+
+
             // Rafraîchir après un délai pour voir l'état final
             setTimeout(async () => {
                 await refreshDeviceList()
                 console.log("Appairage + connexion terminés pour", device.name)
             }, 2000)
 
+
+
         } catch (error) {
             console.error("Erreur appairage:", error)
         }
     }
 
-    async function unpairDevice(device) {
+
+
+    async function unpairDevice(device: BluetoothDevice): Promise<void> {
         try {
             console.log("Suppression appairage", device.name)
             await execAsync(["bluetoothctl", "remove", device.address])
+
+
 
             setRevealedMap(prev => {
                 const map = new Map(prev)
                 map.delete(device.address)
                 return map
             })
+
+
 
             setTimeout(async () => {
                 await refreshDeviceList()
@@ -293,10 +369,14 @@ export function Bluetooth() {
         }
     }
 
-    const sortedDevices = (devices) => {
+
+
+    const sortedDevices = (devices: BluetoothDevice[]): BluetoothDevice[] => {
         if (!Array.isArray(devices)) return []
 
-        return devices.sort((a, b) => {
+
+
+        return devices.sort((a: BluetoothDevice, b: BluetoothDevice) => {
             if (a.connected && !b.connected) return -1
             if (!a.connected && b.connected) return 1
             if (a.paired && !b.paired) return -1
@@ -305,24 +385,29 @@ export function Bluetooth() {
         })
     }
 
-    function renderDevice(device) {
+
+
+    function renderDevice(device: BluetoothDevice) {
         const deviceId = device.address
         const isPaired = device.paired
         const isConnected = device.connected
+
+
 
         return (
             <box orientation={Gtk.Orientation.VERTICAL} marginTop={6}>
                 <button onClicked={() => toggleRevealer(deviceId)}>
                     <box spacing={4}>
-                        <image iconName={device.icon} />
+                        <label label={device.icon} />
                         <label label={device.name} />
-                        {isConnected && <image iconName="object-select-symbolic" />}
                     </box>
                 </button>
 
+
+
                 <revealer
                     hexpand={false}
-                    revealChild={revealedMap(stateMap => !!stateMap.get(deviceId))}
+                    revealChild={revealedMap((stateMap: Map<string, boolean>) => !!stateMap.get(deviceId))}
                     transitionDuration={200}
                     transitionType={Gtk.RevealerTransitionType.SLIDE_DOWN}
                 >
@@ -339,6 +424,8 @@ export function Bluetooth() {
                                 <label label="Appairer & Connecter" />
                             </button>
                         </box>
+
+
 
                         {/* Boutons pour appareils appairés */}
                         <box
@@ -364,11 +451,12 @@ export function Bluetooth() {
         )
     }
 
+
+
     return (
         <menubutton class="bluetooth">
-            <image
-                iconName={bluetoothEnabled(enabled => enabled ? "bluetooth-active-symbolic" : "bluetooth-disabled-symbolic")}
-                pixelSize={16}
+            <label
+                label={bluetoothEnabled((enabled: boolean) => getBluetoothGlyph(enabled))}
             />
             <popover>
                 <scrolledwindow
@@ -379,34 +467,41 @@ export function Bluetooth() {
                     propagateNaturalHeight={false}
                 >
                     <box orientation={Gtk.Orientation.VERTICAL} spacing={6}>
-                        <box orientation={Gtk.Orientation.HORIZONTAL} spacing={10} hexpand>
+                        <box orientation={Gtk.Orientation.HORIZONTAL} spacing={8}>
                             <label label="Bluetooth:" valign={Gtk.Align.CENTER} />
-
                             <switch
                                 active={bluetoothEnabled}
-                                onNotifyActive={handleTogglePower} 
+                                onNotifyActive={handleTogglePower}
+                                valign={Gtk.Align.CENTER}
                             />
-
-                            <box hexpand={true} />
                             <button
-                                label={isScanning(scanning => scanning ? "Scan..." : "Scanner")}
                                 onClicked={scanDevices}
-                                sensitive={bluetoothEnabled(enabled => enabled && !isScanning.get())}
-                            />
+                                sensitive={bluetoothEnabled((enabled: boolean) => enabled && !isScanning.get())}
+                                halign={Gtk.Align.END}
+                                hexpand
+                            >
+                                <label label={isScanning((scanning: boolean) => scanning ? "Scan..." : "Scanner")} />
+                            </button>
                         </box>
 
+
+
                         <For each={allDevices(sortedDevices)}>
-                            {device => renderDevice(device)}
+                            {(device: BluetoothDevice) => renderDevice(device)}
                         </For>
+
+
 
                         <box visible={bluetoothEnabled} hexpand>
                             <label
-                                label={allDevices(devices => `${devices.length} appareils trouvés`)}
+                                label={allDevices((devices: BluetoothDevice[]) => `${devices.length} appareils trouvés`)}
                                 css="font-size: 0.8em; opacity: 0.6;"
                             />
                         </box>
 
-                        <box visible={bluetoothEnabled(enabled => enabled && allDevices.get().length === 0 && !isScanning.get())} hexpand>
+
+
+                        <box visible={bluetoothEnabled((enabled: boolean) => enabled && allDevices.get().length === 0 && !isScanning.get())} hexpand>
                             <label
                                 label="Activez le Bluetooth sur vos appareils et lancez un scan."
                                 css="font-size: 0.9em; opacity: 0.7;"
@@ -417,6 +512,5 @@ export function Bluetooth() {
                 </scrolledwindow>
             </popover>
         </menubutton>
-
     )
 }

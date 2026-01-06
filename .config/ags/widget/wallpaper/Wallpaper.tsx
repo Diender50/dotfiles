@@ -94,7 +94,6 @@ export default function WallpaperCarousel() {
           background-size: cover;
           background-position: center;
           background-repeat: no-repeat;
-          border-radius: 12px;
           min-width: ${PREVIEW_WIDTH}px;
           min-height: ${PREVIEW_HEIGHT}px;
         }

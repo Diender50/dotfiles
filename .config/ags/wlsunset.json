@@ -1,4 +1,5 @@
 {
+  "isActive": true,
   "tempLow": 3000,
   "tempHigh": 6500,
   "duration": 1800,

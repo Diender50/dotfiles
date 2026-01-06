@@ -9,6 +9,7 @@ import { Clock } from "./items/clock"
 import { Battery } from "./items/battery"
 import { Audio } from "./items/volume"
 import { Wireless } from "./items/network"
+import { VPN } from "./items/vpn"
 import { Bluetooth } from "./items/bluetooth"
 import { Tray } from "./items/tray"
 import { WlSunset } from "./items/wlsunset"
@@ -42,22 +43,31 @@ export default function Bar({ gdkmonitor }: { gdkmonitor: Gdk.Monitor }) {
       keymode={Astal.Keymode.ON_DEMAND}
     >
       <centerbox cssName="centerbox">
-        <box $type="start" spacing={8}>
+        <box $type="start" spacing={4}>
           <NiriWorkspaces gdkmonitor={gdkmonitor} />
+          <label label="|" />
           <Updates />
+          <label label="|" />
           <Mpris />
         </box>
-        <box $type="center" spacing={8}>
+        <box $type="center" spacing={4}>
           <Clock />
+          <label label="|" />
           <Weather />
         </box>
-        <box $type="end" spacing={8}>
+        <box $type="end" spacing={4}>
           <Tray />
+          <label label="|" />
           <WlSunset />
+          <label label="|" />
           <Bluetooth />
+          <label label="|" />
           <Wireless />
+          <label label="|" />
           <Audio />
+          <label label="|" />
           <Battery />
+          <label label="|" />
           <PowerMenu />
         </box>
       </centerbox>

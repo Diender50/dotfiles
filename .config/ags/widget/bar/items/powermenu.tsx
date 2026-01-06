@@ -1,14 +1,17 @@
 import GLib from "gi://GLib"
 import Gtk from "gi://Gtk?version=4.0"
+import { glyphs } from "../../../src/lib/glyphs"
+
 
 interface PowerActionProps {
-  iconName: string
+  glyph: string
   tooltip: string
   command: string
   className?: string
 }
 
-function PowerAction({ iconName, tooltip, command, className = "" }: PowerActionProps) {
+
+function PowerAction({ glyph, tooltip, command, className = "" }: PowerActionProps) {
   const handleClick = () => {
     try {
       GLib.spawn_command_line_async(command)
@@ -17,21 +20,23 @@ function PowerAction({ iconName, tooltip, command, className = "" }: PowerAction
     }
   }
 
+
   return (
     <button
       class={`power-action ${className}`}
       onClicked={handleClick}
       tooltipText={tooltip}
     >
-      <image iconName={iconName} pixelSize={24} />
+      <label label={glyph} class="power-glyph" />
     </button>
   )
 }
 
+
 export function PowerMenu() {
   return (
     <menubutton class="powermenu">
-      <image iconName="system-shutdown-symbolic" pixelSize={16} />
+      <label label={glyphs.power.menu} />
       
       <popover>
         <box 
@@ -40,24 +45,21 @@ export function PowerMenu() {
           class="power-popover"
         >
           <PowerAction
-            iconName="system-log-out-symbolic"
+            glyph={glyphs.power.logout}
             tooltip="Logout"
             command="niri msg action quit"
-            className="logout"
           />
           
           <PowerAction
-            iconName="system-reboot-symbolic"
+            glyph={glyphs.power.reboot}
             tooltip="Reboot"
             command="loginctl reboot"
-            className="logout"
           />
           
           <PowerAction
-            iconName="system-shutdown-symbolic"
+            glyph={glyphs.power.shutdown}
             tooltip="Shutdown"
             command="loginctl poweroff"
-            className="logout"
           />
         </box>
       </popover>

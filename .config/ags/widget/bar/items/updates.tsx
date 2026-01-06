@@ -103,7 +103,7 @@ export function Updates() {
                             <button
                                 onClicked={() => {
                                     console.log("Launching pacman update...")
-                                    GLib.spawn_command_line_async("kitty sudo pacman -Syu --noconfirm")
+                                    GLib.spawn_command_line_async("ghostty sudo pacman -Syu --noconfirm")
 
                                     // Auto-refresh après 10 secondes (plus raisonnable)
                                     setTimeout(() => {
@@ -152,7 +152,7 @@ export function Updates() {
                             <button
                                 onClicked={() => {
                                     console.log("Launching AUR update...")
-                                    GLib.spawn_command_line_async("kitty paru -Syu --noconfirm")
+                                    GLib.spawn_command_line_async("ghostty paru -Syu --noconfirm")
 
                                     // Auto-refresh après 15 secondes (AUR prEND plus de temps)
                                     setTimeout(() => {
@@ -215,7 +215,7 @@ export function Updates() {
                             class="global-update-button"
                             onClicked={() => {
                                 console.log("Launching global update...")
-                                GLib.spawn_command_line_async("kitty bash -c 'sudo pacman -Syu && paru -Syu'")
+                                GLib.spawn_command_line_async("ghostty bash -c 'sudo pacman -Syu && paru -Syu'")
 
                                 // Auto-refresh après 20 secondes (le plus long)
                                 setTimeout(() => {

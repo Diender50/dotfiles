@@ -1,34 +1,28 @@
-import AstalBattery from "gi://AstalBattery"
-import AstalPowerProfiles from "gi://AstalPowerProfiles"
-import Gtk from "gi://Gtk?version=4.0"
-
-import { createBinding } from "ags"
-
-import {
-   icons,
-   BatteryIcon,
-} from "../../../src/lib/icons";
+import AstalBattery from "gi://AstalBattery";
+import { createBinding, createComputed } from "ags";
+import { BatteryGlyph } from "../../../src/lib/glyphs";
 
 export function Battery() {
-  const battery = AstalBattery.get_default()
-  const powerprofiles = AstalPowerProfiles.get_default()
+  const battery = AstalBattery.get_default();
 
-  const percent = createBinding(
-    battery,
-    "percentage",
-  )((p) => `${Math.floor(p * 100)}%`)
+  const percentBinding = createBinding(battery, "percentage")(
+    (p: number) => `${Math.floor(p * 100)}%`
+  );
 
-  const setProfile = (profile: string) => {
-    powerprofiles.set_active_profile(profile)
-  }
+  // Utilise createComputed pour combiner plusieurs bindings
+  const glyphAndPercentBinding = createComputed([BatteryGlyph, percentBinding])(
+    (values) => {
+      const [glyph, percent] = values;
+      return `${glyph} ${percent}`;
+    }
+  );
 
   return (
     <box class="battery">
-        <image
-               visible={createBinding(battery, "isPresent")}
-               pixelSize={16}
-               iconName={BatteryIcon}
-            />
+      <label
+        visible={createBinding(battery, "isPresent")}
+        label={glyphAndPercentBinding}
+      />
     </box>
-  )
+  );
 }
